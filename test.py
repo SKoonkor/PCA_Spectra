@@ -1,3 +1,3 @@
 print ('hello world')
 
-print ('test commit')
+print ('test commit via SSH')
