@@ -9,7 +9,7 @@ This repository is for essential calculations for reconstruction of synthetic ga
 
 
 
-The output required for calculating galaxy SEDs:
+## The output required for calculating galaxy SEDs:
 1. Mean Spectra (the output from step 3 above).
 2. First N PCs (Obtains from step 4).
 3. PC coefficient of each PC.
