@@ -13,3 +13,7 @@ This repository is for essential calculations for reconstruction of synthetic ga
 1. Mean Spectra (the output from step 3 above).
 2. First N PCs (Obtains from step 4).
 3. PC coefficient of each PC.
+
+## Order for running scripts
+1. Run the grid generator
+2. Run the SED template generator
