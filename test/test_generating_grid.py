@@ -3,12 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os, sys
 
-
 sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
 
 from FSPS_paramgrid import LHS_generator
 from visualisations import plot_LatinHypercube
 
+plt.rcParams.update({'font.size': 20})
+
+# The Script Starts Here
 
 FSPS_param_names = ['tage', 
                     'logzsol']
@@ -28,4 +30,6 @@ FSPS_param_values = LHS_generator(FSPS_param_names, FSPS_param_ranges, FSPS_para
 
 
 fig, ax = plot_LatinHypercube(FSPS_param_names, FSPS_param_values, FSPS_param_spacings, index_x = 0, index_y = 1)
+plt.savefig('LatinHS_tage_logzsol.png')
 plt.show()
+
