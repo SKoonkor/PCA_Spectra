@@ -28,10 +28,26 @@ FSPS_param_values = LHS_generator(FSPS_param_names,
 
 output_dir = '/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/data/'
 
-np.savetxt(output_dir+'FSPS_param_grid_LHS.csv', FSPS_param_values)
+
+# Save the parameter space to the data directory
+param_grid_output_filename = 'FSPS_param_grid_LHS.csv'
+np.savetxt(output_dir + param_grid_output_filename, FSPS_param_values)
+print ('The parameter space has been saved to: ' + output_dir + param_grid_output_filename)
 
 
-with open(output_dir+'FSPS_param_grid_names.txt', 'w') as f:
-    for name, space in zip(FSPS_param_names, FSPS_param_spacings):
-        f.write('%s, %s \n' % (name, space))
-f.close()
+# Output the parameter names to the data directory
+param_name_filename = 'FSPS_param_grid_names.txt'
+with open(output_dir + param_name_filename, 'w') as f_name:
+    for name in FSPS_param_names:
+        f_name.write('%s\n' %name)
+f_name.close()
+print ('The parameter names have been stored at: ' + output_dir + param_name_filename)
+
+
+# Output the parameter spacings to the data directory
+param_spacing_filename = 'FSPS_param_grid_spacings.txt'
+with open(output_dir + param_spacing_filename, 'w') as f_spacing:
+    for spacing in FSPS_param_spacings:
+        f_spacing.write('%s\n' %spacing)
+f_spacing.close()
+print ('The parameter spacings have been stored at: ' + output_dir + param_spacing_filename)

@@ -1,2 +1,2 @@
-tage, log 
-logzsol, linear 
+tage
+logzsol
