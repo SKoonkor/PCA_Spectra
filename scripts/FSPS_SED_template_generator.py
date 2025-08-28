@@ -42,5 +42,4 @@ FSPS_SED_generator(param_names = param_grid_names,
                    output_wave_filename = output_wave_filename,
                    output_SED_template_filename = output_SED_template_filename)
 
-
 print ('SED TEMPLATE GENERATION COMPLETE')
