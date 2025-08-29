@@ -21,10 +21,21 @@ SED = np.genfromtxt(data_dir + SED_filename)
 wave_min = 5000
 wave_max = 1e4
 
+# Define the masked data filenames
+wave_masked_filename = 'FSPS_wave_masked.csv'
+SED_masked_filename = 'FSPS_SED_masked.csv'
+
+# Export the masked data
 wave_masked, SED_masked = mask_SED(wave, SED, wave_min = wave_min, wave_max = wave_max)
+np.savetxt(data_dir + wave_masked_filename, wave_masked)
+print ('\nWavelengths (masked) stored at: ')
+print (data_dir + wave_masked_filename)
+np.savetxt(data_dir + SED_masked_filename, SED_masked)
+print ('\nSEDs (masked) stored at: ')
+print (data_dir + SED_masked_filename)
 
 # normalise the SEDs
-norm_type = 'l2'
+norm_type = 'std'
 SED_norm, SED_norm_factor, SED_norm_mean = normalise_SED(wave_masked, SED_masked, norm_type = norm_type)
 
 

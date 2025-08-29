@@ -31,7 +31,7 @@ def plot_SED(ax, wave, SED,
 
     # Check if the color for the plot is defined, if not pick a random RGB color
     if color == None:
-        color = np.random.ran(3,)
+        color = np.random.rand(3,)
 
     # Plot the SED
     ax.plot(wave, SED, color = color, label = label, ls = ls, lw = lw)
