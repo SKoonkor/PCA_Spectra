@@ -3,17 +3,21 @@ This repository is for essential calculations for reconstruction of synthetic ga
 ## The main structure of the code:
 1. Use the Latin Hypercube Sampling method to generate the FSPS parameter grid, required for the SSP SED set.
 2. Mask the SED to a specific redshift range essential for a given project (observation configurations)
-3. Data preprocessing via L1, L2, or 5500A normalisation.
+3. Data preprocessing via L1, L2, 5500A, or Center&Standardise normalisation.
 4. PCA application on the normalised SEDs.
 5. SED reconstruction using the PC coefficients.
 
 
 
 ## The output required for calculating galaxy SEDs:
-1. Mean Spectra (the output from step 3 above).
-2. First N PCs (Obtains from step 4).
-3. PC coefficient of each PC.
+1. Mean Spectra
+2. Scaling factor (From Step 3 above)
+3. First N PCs (Obtains from step 4)
+4. PC coefficient of each PC
 
 ## Order for running scripts
-1. Run the grid generator
-2. Run the SED template generator
+1. Run the grid generator.
+2. Run the SED template generator.
+3. Run the masking step (by applying the wavelength selection).
+4. Run the normalisation method (preprocessing for PCA).
+5. Run the PCA on the normalised SEDs
