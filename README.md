@@ -18,10 +18,14 @@ This repository is for essential calculations for reconstruction of synthetic ga
 ## Order for running scripts
 1. Run the grid generator.
     ```
-    $ FSPS\_param\_grid\_generator.py 
+    $ python3 FSPS_param_grid_generator.py
     ```
 2. Run the SED template generator.
-    _FSPS\_SED\_template\_generator.py_
+    ``` 
+    $ python3 FSPS_SED_template_generator.py
+    ```
 3. Run the masking step (by applying the wavelength selection) and the normalisation method (preprocessing for PCA).
-    _FSPS\_SED\_normalisation.py    
+    ``` 
+    $ python3 FSPS_SED_normalisation.py    
+    ```
 4. Run the PCA on the normalised SEDs
