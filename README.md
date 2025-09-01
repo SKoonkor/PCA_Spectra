@@ -1,10 +1,10 @@
-#PCA Spectra
+# PCA Spectra
 
 ## Table of contents
-* [General info] (#general-info)
-* [Code structure] (#code-structure)
-* [Outputs] (#outputs)
-* [Scripts] (#scripts)
+* [General info](#general-info)
+* [Code structure](#code-structure)
+* [Outputs](#outputs)
+* [Scripts](#scripts)
 
 ## General info
 This repository is for essential calculations for reconstruction of synthetic galaxy spectra using the Principal Component Analysis (PCA). Mainly, it makes use for the python-FSPS code for generating the simple stellar population (SSP) spectra
