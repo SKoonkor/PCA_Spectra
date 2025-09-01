@@ -1,4 +1,4 @@
-# PCA_Spectra
+# PCA Spectra
 This repository is for essential calculations for reconstruction of synthetic galaxy spectra using the Principal Component Analysis (PCA). Mainly, it makes use for the python-FSPS code for generating the simple stellar population (SSP) spectra
 ## The main structure of the code:
 1. Use the Latin Hypercube Sampling method to generate the FSPS parameter grid, required for the SSP SED set.
@@ -17,7 +17,9 @@ This repository is for essential calculations for reconstruction of synthetic ga
 
 ## Order for running scripts
 1. Run the grid generator.
+    _FSPS\_param\_grid\_generator.py_
 2. Run the SED template generator.
-3. Run the masking step (by applying the wavelength selection).
-4. Run the normalisation method (preprocessing for PCA).
-5. Run the PCA on the normalised SEDs
+    _FSPS\_SED\_template\_generator.py_
+3. Run the masking step (by applying the wavelength selection) and the normalisation method (preprocessing for PCA).
+    _FSPS\_SED\_normalisation.py    
+4. Run the PCA on the normalised SEDs
