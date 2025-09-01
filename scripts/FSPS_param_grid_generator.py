@@ -40,7 +40,7 @@ FSPS_param_values = LHS_generator(FSPS_param_names,
                                   n_samples = N_samples)
 
 output_dir = '/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/data/'
-
+os.makedirs(output_dir, exist_ok = True) # Create a data/ directory 
 
 # Save the parameter space to the data directory
 param_grid_output_filename = 'FSPS_param_grid_LHS.csv'

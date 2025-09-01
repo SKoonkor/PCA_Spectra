@@ -13,6 +13,8 @@ from FSPS_calculations import FSPS_initializer, FSPS_SED_generator
 
 # Define filenames and directory for storing SED template information
 data_dir = '/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/data/'
+os.makedirs(data_dir, exist_ok = True)
+
 # Input files
 param_name_filename = 'FSPS_param_grid_names.txt'
 param_grid_filename = 'FSPS_param_grid_LHS.csv'

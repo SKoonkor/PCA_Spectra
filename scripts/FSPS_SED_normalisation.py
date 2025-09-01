@@ -10,6 +10,7 @@ from PCA_cal import mask_SED, normalise_SED
 ############################################################################################
 #### Script starts here
 data_dir = '../data/'
+os.makedirs(data_dir, exist_ok = True)
 wave_filename = 'FSPS_wave.csv'
 SED_filename = 'FSPS_SED_templates.csv'
 
