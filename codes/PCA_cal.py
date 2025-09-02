@@ -72,7 +72,7 @@ def normalise_SED(wave, SED, norm_type = 'std', eps = 0):
 
 
 
-def PCA_SED(n_components = 20):
+def PCA_SED(SED, n_components = 20, output_dir = 'output/'):
     # The SED are dimentionally reduced to n_components
     # Instead of using the wavelengths as the vector for the spectra,
     # The spectra are projected onto the principal components (PCs)
@@ -80,7 +80,45 @@ def PCA_SED(n_components = 20):
     # They are described as S = c_ik* PC
     # notation: spectrum i-th, wavelentgh j-th.
 
-    return 
+    print ('\n#################################################')
+    print ('########### RUNNING PCA ON SPECTRA ##############')
+    print ('#################################################')
+
+
+    # Initiailise the scikit-learn PCA package
+    print (' Initialising sklearn PCA')
+    PCA_fn = skPCA(n_components = n_components)
+
+    # Fit the PCA on the SED templates
+    print ('\n Fitting PCA on SEDs')
+    PCA_fn.fit(SED)
+
+    # Calculate the coefficient for each SED tempalte and get the eigen vectors (PCs)
+    print ('\n Getting coeffs and PCs')
+    PCA_coeffs = PCA_fn.transform(SED)
+    PCA_PCs = PCA_fn.components_
+    
+    print ('\n Writing the output files')
+    # Define the output filenames
+    PCA_coeff_filename = 'PCA_coeffs.csv'
+    PCA_PC_filename = 'PCA_PCs.csv'
+
+    # Create the output directory
+    os.makedirs(output_dir, exist_ok = True)
+
+
+    np.savetxt(output_dir + PCA_coeff_filename, PCA_coeffs)
+    print ('\n PCA coeffs stored at: ')
+    print (output_dir + PCA_coeff_filename)
+    
+    np.savetxt(output_dir + PCA_PC_filename, PCA_PCs)
+    print ('\n PCA PCs stored at: ')
+    print (output_dir + PCA_PC_filename)
+
+    print ('\n PCA RUN COMPLETE')
+    print ('\n################################################')
+    
+    return PCA_coeffs, PCA_PCs
 
 def denormalise_SED(SED_norm, SED_std, SED_mean):
     # This de-normalise the normalised SEDs back to the original
@@ -91,15 +129,22 @@ def denormalise_SED(SED_norm, SED_std, SED_mean):
     #
 
     print ('\n#################################################')
-    print ('################ denormise SED ##################')
+    print ('############### Denormalise SED #################')
     print ('#################################################')
     return SED_norm*SED_std + SED_mean
 
-def PCA_recon():
+def reconstruct_PCA_SED(coeffs, PCs, n_components):
     # This reconstruct the PCA SEDs back to the 'original SEDs'
     
+    #######################################################################
+    # input n_components cannot be larger than the total number of PCs or Featuers
+    n_components = int(min(n_components, len(PCs), len(PCs[0])))
+    print ('n_components used: ', n_components)
+    SED_recon = np.zeros(len(PCs[0]))
+    for i in range(n_components):
+        SED_recon += coeffs[i]*PCs[i] 
 
-    return 
+    return SED_recon
 
 
 

@@ -19,8 +19,8 @@ wave = np.genfromtxt(data_dir + wave_filename)
 SED = np.genfromtxt(data_dir + SED_filename)
 
 # Mask the SED by applying the wavelength range
-wave_min = 5000
-wave_max = 1e4
+wave_min = 1e3  
+wave_max = 5e4
 
 # Define the masked data filenames
 wave_masked_filename = 'FSPS_wave_masked.csv'
