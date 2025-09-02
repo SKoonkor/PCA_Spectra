@@ -20,7 +20,8 @@ This repository is for essential calculations for reconstruction of synthetic ga
 1. Mean Spectra
 2. Scaling factor (From Step 3 above)
 3. First N PCs (Obtains from step 4)
-4. PC coefficient of each PC
+4. PC coefficients of each PC
+5. SED interpolation using the PC coefficients 
 
 ## Scripts
 1. Run the grid generator.
@@ -36,3 +37,7 @@ This repository is for essential calculations for reconstruction of synthetic ga
     $ python3 FSPS_SED_normalisation.py    
     ```
 4. Run the PCA on the normalised SEDs
+    ```
+    $ python3 PCA_run.py
+    ```
+5. Interpolate the SED to couple with the SFHs
