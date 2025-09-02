@@ -72,7 +72,7 @@ def normalise_SED(wave, SED, norm_type = 'std', eps = 0):
 
 
 
-def PCA_SED(SED, n_components = 20, output_dir = 'output/'):
+def PCA_SED(SED, n_components = 20, output_dir = 'outputs/'):
     # The SED are dimentionally reduced to n_components
     # Instead of using the wavelengths as the vector for the spectra,
     # The spectra are projected onto the principal components (PCs)

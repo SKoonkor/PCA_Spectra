@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+from scipy.spatial import Delaunay
 
 import fsps
 
@@ -72,6 +73,62 @@ def FSPS_SED_generator(param_names,
     print ('SED templates stored at: ' + data_dir + output_SED_template_filename + '\n')
     np.savetxt(data_dir + output_wave_filename, wave)
     print ('Wavelengths stored at: ' + data_dir + output_wave_filename + '\n')
+
+
+class SEDInterpolator:
+
+    def __init__(self, tage, logzsol, coeffs):
+        """
+        Parameters
+        __________
+        tage : array (N,)
+            Stellar ages for each template
+        logzsol : array (N,)
+            Log metallicities for each template
+        coeffs : array (N, k)
+            PCA coefficients for each template (k = number of PCs)
+        """
+        self.points = np.column_stack([tage, logzsol])
+        self.coeffs = coeffs
+        self.tri = Delaunay(self.points)
+
+
+    def interpolate(self, tage_new, logzsol_new):
+        """
+        Interpolate PCA coefficients for new parameters.
+
+        Parameters
+        __________
+        tage_new : float
+        logzsol_new : float
+
+        Returns
+        _______
+        coeff_interp : array (k,)
+            Interpolated PCA coefficients
+
+        """
+        p = np.array([tage_new, logzsol_new]) # point_interp where we want to interpolate
+        simplex = self.tri.find_simplex(p)
+        
+        if simplex == -1:
+            raise ValueError('Point outside convex hull of training grid.')
+
+        vertices = self.tri.simplices[simplex]
+        X = self.tri.transform[simplex, :2]
+        Y = p - self.tri.transform[simplex, 2]
+
+        bary = np.dot(X, Y)
+        bary = np.append(bary, 1 - bary.sum())
+
+        coeff_interp = np.dot(bary, self.coeffs[vertices])
+
+        return coeff_interp
+        
+
+
+
+
 
 
 

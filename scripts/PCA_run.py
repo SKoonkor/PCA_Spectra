@@ -25,7 +25,12 @@ output_dir = '../outputs/'
 
 #### RUN PCA on SEDs
 
-PCA_coeffs, PCA_PCs = PCA_SED(SED, output_dir = output_dir, n_components = 150)
+PCA_coeffs, PCA_PCs = PCA_SED(SED, output_dir = output_dir, n_components = 200)
+
+print ('coeff shape: ', PCA_coeffs.shape)
+print ('coeff len: ', len(PCA_coeffs))
+print ('PCs shape: ', PCA_PCs.shape)
+
 
 
 

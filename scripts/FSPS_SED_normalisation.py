@@ -19,7 +19,7 @@ wave = np.genfromtxt(data_dir + wave_filename)
 SED = np.genfromtxt(data_dir + SED_filename)
 
 # Mask the SED by applying the wavelength range
-wave_min = 1e3  
+wave_min = 3e2  
 wave_max = 5e4
 
 # Define the masked data filenames

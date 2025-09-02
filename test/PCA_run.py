@@ -27,7 +27,7 @@ SED_original = np.genfromtxt(data_dir + SED_original_filename)
 
 ###########################################################################################
 
-PCA_coeffs, PCA_PCs = PCA_SED(SED_norm)
+PCA_coeffs, PCA_PCs = PCA_SED(SED_norm, n_components = 200)
 
 
 print ('Coeffs shape: ', PCA_coeffs.shape)
