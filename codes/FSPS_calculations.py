@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from scipy.spatial import Delaunay
+from scipy.interpolate import RegularGridInterpolator
 
 import fsps
 
@@ -124,10 +125,84 @@ class SEDInterpolator:
         coeff_interp = np.dot(bary, self.coeffs[vertices])
 
         return coeff_interp
+
+def reshape_coeff_grid(params, coeffs):
+    """
+    Reshape flattened parameter grid into 2D rectangular arrays.
+    
+    Parameters
+    ----------
+    params : (Nt*Nz, 2) array
+        First column = tage, second = logz
+    coeffs : (Nt*Nz, k) array
+        PCA coefficients
         
+    Returns
+    -------
+    tage_grid : (Nt,) unique sorted tage values
+    logz_grid : (Nz,) unique sorted logz values
+    coeff_grid : (Nt, Nz, k)
+    """
+    tage_vals = np.unique(params[:,0])
+    logz_vals = np.unique(params[:,1])
+    Nt, Nz = len(tage_vals), len(logz_vals)
+    k = coeffs.shape[1]
 
+    coeff_grid = np.zeros((Nt, Nz, k))
+    for (t, z), c in zip(params, coeffs):
+        i = np.where(tage_vals == t)[0][0]
+        j = np.where(logz_vals == z)[0][0]
+        coeff_grid[i,j,:] = c
+    
+    return tage_vals, logz_vals, coeff_grid
+        
+def SEDInterpolator_rect(tage_grid, logz_grid, coeff_grid, tage_new, logz_new):
+    """
+    Bilinear interpolation of PCA coefficients on a rectangular grid.
 
+    Parameters
+    ----------
+    tage_grid : (Nt,) array of tage values (must be ascending)
+    logz_grid : (Nz,) array of logZ values (must be ascending)
+    coeff_grid : (Nt, Nz, k) PCA coefficients
+    tage_new : float
+    logz_new : float
 
+    Returns
+    -------
+    coeff_new : (k,) interpolated coefficients
+    """
+
+    # find bracketing indices
+    i1 = np.searchsorted(tage_grid, tage_new)
+    j1 = np.searchsorted(logz_grid, logz_new)
+    i0 = max(i1 - 1, 0)
+    j0 = max(j1 - 1, 0)
+    i1 = min(i1, len(tage_grid) - 1)
+    j1 = min(j1, len(logz_grid) - 1)
+
+    # interpolation weights
+    if tage_grid[i1] == tage_grid[i0]:
+        wt0, wt1 = 1.0, 0.0
+    else:
+        wt1 = (tage_new - tage_grid[i0]) / (tage_grid[i1] - tage_grid[i0])
+        wt0 = 1.0 - wt1
+
+    if logz_grid[j1] == logz_grid[j0]:
+        wz0, wz1 = 1.0, 0.0
+    else:
+        wz1 = (logz_new - logz_grid[j0]) / (logz_grid[j1] - logz_grid[j0])
+        wz0 = 1.0 - wz1
+
+    # bilinear combination of 4 neighbors
+    coeff_new = (
+        wt0 * wz0 * coeff_grid[i0, j0, :]
+        + wt0 * wz1 * coeff_grid[i0, j1, :]
+        + wt1 * wz0 * coeff_grid[i1, j0, :]
+        + wt1 * wz1 * coeff_grid[i1, j1, :]
+    )
+
+    return coeff_new
 
 
 

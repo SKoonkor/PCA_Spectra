@@ -6,29 +6,29 @@ from sklearn import preprocessing
 from sklearn.decomposition import PCA as skPCA
 from sklearn.decomposition import IncrementalPCA as skIncrementalPCA
 
-def mask_SED(wave, SED, wave_min, wave_max):
-    # This applies a wavelength masking on the SEDs
-    # Only information between min_wave < wavelength < max_wave is selected
+# def mask_SED(wave, SED, wave_min, wave_max):
+#     # This applies a wavelength masking on the SEDs
+#     # Only information between min_wave < wavelength < max_wave is selected
+# 
+#     # Make use of numpy for masking which is more computationally efficient. 
+#     wave_mask = np.where((wave >= wave_min)& (wave <= wave_max))[0]
+# 
+# 
+#     wave_output = wave[wave_mask]
+#     SED_output = SED[:, wave_mask]
+#     print ('\n*************************************************')
+#     print ('****************  Masking Process ***************')
+#     print ('*************************************************')
+#     print ('\nOriginal wavelengths')
+#     print ('shape: {}'.format(wave.shape))
+#     print ('Min: {:.2e} AA,  Max: {:.2e} AA\n\n'.format(min(wave), max(wave)))
+#     print ('Output wavelengths')
+#     print ('shape: {}'.format(wave_output.shape))
+#     print ('Min: {:.2e} AA, MAX: {:.2e} AA\n'.format(min(wave_output), max(wave_output)))  
+#     print ('*************************************************')
+#     return wave[wave_mask], SED[:, wave_mask]
 
-    # Make use of numpy for masking which is more computationally efficient. 
-    wave_mask = np.where((wave >= wave_min)& (wave <= wave_max))[0]
-
-
-    wave_output = wave[wave_mask]
-    SED_output = SED[:, wave_mask]
-    print ('\n*************************************************')
-    print ('****************  Masking Process ***************')
-    print ('*************************************************')
-    print ('\nOriginal wavelengths')
-    print ('shape: {}'.format(wave.shape))
-    print ('Min: {:.2e} AA,  Max: {:.2e} AA\n\n'.format(min(wave), max(wave)))
-    print ('Output wavelengths')
-    print ('shape: {}'.format(wave_output.shape))
-    print ('Min: {:.2e} AA, MAX: {:.2e} AA\n'.format(min(wave_output), max(wave_output)))  
-    print ('*************************************************')
-    return wave[wave_mask], SED[:, wave_mask]
-
-def mask_SED_streamed(wave_filename, SED_filename, wave_min, wave_max, output_filename, chunk_size = 1000):
+def mask_SED(wave_filename, SED_filename, wave_min, wave_max, output_filename, chunk_size = 1000):
     '''
     Apply wavelength mask on SEDs without loading the entire file into memory.
     Read SEDs chunk by chunk and writes maksed results directly to disk.
@@ -49,7 +49,7 @@ def mask_SED_streamed(wave_filename, SED_filename, wave_min, wave_max, output_fi
         The number of SEDs we want to mask each iteration
 
 
-    Outputs
+    Returns
     _______
 
 
@@ -83,49 +83,49 @@ def mask_SED_streamed(wave_filename, SED_filename, wave_min, wave_max, output_fi
     print ('*************************************************')
 
 
-def normalise_SED(wave, SED, norm_type = 'std', eps = 0):
-    # This function is for normalising SEDs with 3 normalisation options
-    #   1. The L1 norm
-    #   2. The L2 norm (Dafault)
-    #   3. The flux at 5500A.
+# def normalise_SED(wave, SED, norm_type = 'std', eps = 0):
+#     # This function is for normalising SEDs with 3 normalisation options
+#     #   1. The L1 norm
+#     #   2. The L2 norm (Dafault)
+#     #   3. The flux at 5500A.
+# 
+#     print ('\n#################################################')
+#     print ('################ Normalise SEDs #################')
+#     print ('#################################################')
+#     
+#     SED = np.asarray(SED, dtype = float)
+# 
+#     # If using 'L1' or 'L2' for normalisation (which require the preprocessing package from scikit-learn)
+#     if norm_type in ['l1', 'l2']:
+#         SED_norm,  SED_norm_factor = preprocessing.normalize(SED, norm = norm_type, return_norm = True)
+#         print ('\nNormalisation method: ', norm_type)
+#         
+#     # If using the 5500A flux
+#     elif norm_type == '5500A':
+#         # Fnid the index for 5500A (or the closest wavelength)
+#         index_5500A = np.where(wave == min(abs(wave - 5500)) + 5500)[0][0]
+# 
+#         SED_norm_factor = SED.transpose()[index_5500A] # Take the flux at 5500A of each spectrum
+#         SED_norm = SED/SED_norm_factor.reshape(-1, 1)
+#         SED_norm_mean = np.mean(SED_norm, axis = 0)
+#         print ('\nNormalisation method: ', norm_type)
+# 
+#     elif norm_type == 'std':
+#         # This methed centres the SEDs to its mean (so the normalised SEDs have zero mean)
+#         # Then it scales the centered SEDs to have std = 1.
+#         SED_norm_mean = np.nanmean(SED, axis = 0)
+#         sigma = np.nanstd(SED, axis = 0 , ddof = 1)
+#         SED_norm = (SED - SED_norm_mean)/(sigma + eps)
+#         SED_norm_factor = sigma
+#         print ('\nNormalisation method: ', norm_type) 
+# 
+#     else:
+#         raise Exception('The normalisation should be \'l1\', \'l2\', \'std\' or \'5500A\' only')
+# 
+#     print ('\n#################################################')
+#     return SED_norm, SED_norm_factor, SED_norm_mean
 
-    print ('\n#################################################')
-    print ('################ Normalise SEDs #################')
-    print ('#################################################')
-    
-    SED = np.asarray(SED, dtype = float)
-
-    # If using 'L1' or 'L2' for normalisation (which require the preprocessing package from scikit-learn)
-    if norm_type in ['l1', 'l2']:
-        SED_norm,  SED_norm_factor = preprocessing.normalize(SED, norm = norm_type, return_norm = True)
-        print ('\nNormalisation method: ', norm_type)
-        
-    # If using the 5500A flux
-    elif norm_type == '5500A':
-        # Fnid the index for 5500A (or the closest wavelength)
-        index_5500A = np.where(wave == min(abs(wave - 5500)) + 5500)[0][0]
-
-        SED_norm_factor = SED.transpose()[index_5500A] # Take the flux at 5500A of each spectrum
-        SED_norm = SED/SED_norm_factor.reshape(-1, 1)
-        SED_norm_mean = np.mean(SED_norm, axis = 0)
-        print ('\nNormalisation method: ', norm_type)
-
-    elif norm_type == 'std':
-        # This methed centres the SEDs to its mean (so the normalised SEDs have zero mean)
-        # Then it scales the centered SEDs to have std = 1.
-        SED_norm_mean = np.nanmean(SED, axis = 0)
-        sigma = np.nanstd(SED, axis = 0 , ddof = 1)
-        SED_norm = (SED - SED_norm_mean)/(sigma + eps)
-        SED_norm_factor = sigma
-        print ('\nNormalisation method: ', norm_type) 
-
-    else:
-        raise Exception('The normalisation should be \'l1\', \'l2\', \'std\' or \'5500A\' only')
-
-    print ('\n#################################################')
-    return SED_norm, SED_norm_factor, SED_norm_mean
-
-def normalise_SED_twopass(wave, SED_filename, norm_type = 'std', eps = 0, chunk_size = 1000, output_filename = None):
+def normalise_SED(wave, SED_filename, norm_type = 'std', eps = 0, chunk_size = 1000, output_filename = None):
     '''
     This perform a Memory-efficient SED normalisation.
 
@@ -216,53 +216,53 @@ def normalise_SED_twopass(wave, SED_filename, norm_type = 'std', eps = 0, chunk_
 
 
 
-def PCA_SED(SED, n_components = 20, output_dir = 'outputs/'):
-    # The SED are dimentionally reduced to n_components
-    # Instead of using the wavelengths as the vector for the spectra,
-    # The spectra are projected onto the principal components (PCs)
-    # The SED instead of represented as F_ij = f_ij * I_j,
-    # They are described as S = c_ik* PC
-    # notation: spectrum i-th, wavelentgh j-th.
-
-    print ('\n#################################################')
-    print ('########### RUNNING PCA ON SPECTRA ##############')
-    print ('#################################################')
-
-
-    # Initiailise the scikit-learn PCA package
-    print (' Initialising sklearn PCA')
-    PCA_fn = skPCA(n_components = n_components)
-
-    # Fit the PCA on the SED templates
-    print ('\n Fitting PCA on SEDs')
-    PCA_fn.fit(SED)
-
-    # Calculate the coefficient for each SED tempalte and get the eigen vectors (PCs)
-    print ('\n Getting coeffs and PCs')
-    PCA_coeffs = PCA_fn.transform(SED)
-    PCA_PCs = PCA_fn.components_
-    
-    print ('\n Writing the output files')
-    # Define the output filenames
-    PCA_coeff_filename = 'PCA_coeffs.csv'
-    PCA_PC_filename = 'PCA_PCs.csv'
-
-    # Create the output directory
-    os.makedirs(output_dir, exist_ok = True)
-
-
-    np.savetxt(output_dir + PCA_coeff_filename, PCA_coeffs)
-    print ('\n PCA coeffs stored at: ')
-    print (output_dir + PCA_coeff_filename)
-    
-    np.savetxt(output_dir + PCA_PC_filename, PCA_PCs)
-    print ('\n PCA PCs stored at: ')
-    print (output_dir + PCA_PC_filename)
-
-    print ('\n PCA RUN COMPLETE')
-    print ('\n################################################')
-    
-    return PCA_coeffs, PCA_PCs
+# def PCA_SED(SED, n_components = 20, output_dir = 'outputs/'):
+#     # The SED are dimentionally reduced to n_components
+#     # Instead of using the wavelengths as the vector for the spectra,
+#     # The spectra are projected onto the principal components (PCs)
+#     # The SED instead of represented as F_ij = f_ij * I_j,
+#     # They are described as S = c_ik* PC
+#     # notation: spectrum i-th, wavelentgh j-th.
+# 
+#     print ('\n#################################################')
+#     print ('########### RUNNING PCA ON SPECTRA ##############')
+#     print ('#################################################')
+# 
+# 
+#     # Initiailise the scikit-learn PCA package
+#     print (' Initialising sklearn PCA')
+#     PCA_fn = skPCA(n_components = n_components)
+# 
+#     # Fit the PCA on the SED templates
+#     print ('\n Fitting PCA on SEDs')
+#     PCA_fn.fit(SED)
+# 
+#     # Calculate the coefficient for each SED tempalte and get the eigen vectors (PCs)
+#     print ('\n Getting coeffs and PCs')
+#     PCA_coeffs = PCA_fn.transform(SED)
+#     PCA_PCs = PCA_fn.components_
+#     
+#     print ('\n Writing the output files')
+#     # Define the output filenames
+#     PCA_coeff_filename = 'PCA_coeffs.csv'
+#     PCA_PC_filename = 'PCA_PCs.csv'
+# 
+#     # Create the output directory
+#     os.makedirs(output_dir, exist_ok = True)
+# 
+# 
+#     np.savetxt(output_dir + PCA_coeff_filename, PCA_coeffs)
+#     print ('\n PCA coeffs stored at: ')
+#     print (output_dir + PCA_coeff_filename)
+#     
+#     np.savetxt(output_dir + PCA_PC_filename, PCA_PCs)
+#     print ('\n PCA PCs stored at: ')
+#     print (output_dir + PCA_PC_filename)
+# 
+#     print ('\n PCA RUN COMPLETE')
+#     print ('\n################################################')
+#     
+#     return PCA_coeffs, PCA_PCs
 
 def incrementalPCA_SED(SED_filename, n_components = 20, output_dir = '../outputs/', chunk_size = 2000):
     '''
