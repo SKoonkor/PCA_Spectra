@@ -20,7 +20,7 @@ FSPS_param_ranges = np.array([[-5, np.log10(13.7)],
 FSPS_param_spacings = ['log',
                        'linear']
 
-N_samples = 20000
+N_samples = 50000
 
 
 # Show the LHS setup on the screen

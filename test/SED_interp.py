@@ -21,7 +21,7 @@ SED_norm_factor_std_filename = 'FSPS_SED_norm_factor_std.csv'
 SED_norm_mean_std_filename = 'FSPS_SED_norm_mean_std.csv'
 
 # Define the PCA output directory
-PCA_output_dir = 'outputs/'
+PCA_output_dir = '../outputs/'
 PCA_PC_filename = 'PCA_PCs.csv'
 PCA_coeff_filename = 'PCA_coeffs.csv'
 

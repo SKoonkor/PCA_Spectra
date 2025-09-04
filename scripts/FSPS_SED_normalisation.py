@@ -4,7 +4,7 @@ import os, sys
 
 # Local python libraries
 sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
-from PCA_cal import mask_SED, normalise_SED 
+from PCA_cal import mask_SED, normalise_SED, normalise_SED_twopass 
 
 
 ############################################################################################
@@ -49,6 +49,7 @@ SED_norm_output_filename = 'FSPS_SED_norm_{}.csv'.format(norm_type)
 SED_norm_factor_output_filename = 'FSPS_SED_norm_factor_{}.csv'.format(norm_type)
 SED_norm_mean_output_filename = 'FSPS_SED_norm_mean_{}.csv'.format(norm_type)
 
+
 # Store the files
 np.savetxt(data_dir + wave_norm_output_filename, wave_masked)
 print ('\nWavelengths (normalised) stored at:')
@@ -65,6 +66,20 @@ print (data_dir + SED_norm_factor_output_filename)
 np.savetxt(data_dir + SED_norm_mean_output_filename, SED_norm_mean)
 print ('\nSED mean (normalised) stored at:')
 print (data_dir + SED_norm_mean_output_filename)
+
+
+
+# Define the normalised SEDs using the two-pass algorithm
+SED_norm_twopass_output_filename = 'FSPS_SED_norm_{}_twopass.csv'.format(norm_type)
+SED_norm_mean_twopass_output_filename = 'FSPS_SED_norm_mean_{}_twopass.csv'.format(norm_type)
+SED_norm_factor_twopass_output_filename = 'FSPS_SED_norm_factor_{}_twopass.csv'.format(norm_type)
+
+SED_factor_twopass, SED_mean_twopass = normalise_SED_twopass(wave_masked, data_dir + SED_masked_filename, 
+                                                             norm_type = norm_type, chunk_size = 1000, output_filename =
+                                                             data_dir + SED_norm_twopass_output_filename)
+np.savetxt(data_dir + SED_norm_factor_twopass_output_filename, SED_factor_twopass)
+np.savetxt(data_dir + SED_norm_mean_twopass_output_filename, SED_mean_twopass)
+
 
 print ('\nSED NORMALISATION COMPLETE')
 
