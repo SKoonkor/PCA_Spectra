@@ -176,7 +176,7 @@ def normalise_SED_twopass(wave, SED_filename, norm_type = 'std', eps = 0, chunk_
         n_rows += chunk.shape[0]
 
     mean_vals = total/n_rows
-    std_vals = np.sqrt(total_sq/n_rows - mean_vals**2)
+    std_vals = np.sqrt(total_sq/(n_rows-1) - mean_vals**2)
     
     print ('\n2nd pass of the two-pass algorithm')
     print (' Normalising spectra and writing output...')
@@ -195,14 +195,16 @@ def normalise_SED_twopass(wave, SED_filename, norm_type = 'std', eps = 0, chunk_
                 idx_5500A = np.argmin(abs(wave - 5500))
                 factor = row[idx_5500A]
                 row_norm = row/(factor + eps)
+                    
             elif norm_type == 'std':
                 row_norm = (row - mean_vals)/(std_vals + eps)
+
             else:
                 raise Exception('Unknow norm_type (only l1, l2, 5500A, or std)')
 
 
             if output_filename:
-                fout.write(' '.join(map(str, row_norm)) + '\n')
+                fout.write(' '.join(f'{val:.18e}' for val in row_norm) + '\n')
 
     if output_filename:
         fout.close()
@@ -293,14 +295,14 @@ def incrementalPCA_SED(SED_filename, n_components = 20, output_dir = '../outputs
     ipca = skIncrementalPCA(n_components = n_components, batch_size = chunk_size)
 
     print('\n First pass: fitting PCA in batches')
-    reader = pd.read_csv(SED_filename, chunksize = chunk_size, header = None, delim_whitespace = True)
+    reader = pd.read_csv(SED_filename, chunksize = chunk_size, header = None, sep = '\s+')
     for i, chunk in enumerate(reader):
         ipca.partial_fit(chunk.astype(float).values)
         print(f'  Fitted batch {i+1}')
 
     print('\n Second pass: transforming spectra')
     coeffs_list = []
-    reader = pd.read_csv(SED_filename, chunksize = chunk_size, header = None)
+    reader = pd.read_csv(SED_filename, chunksize = chunk_size, header = None, sep = '\s+')
     for i, chunk in enumerate(reader):
         coeffs = ipca.transform(chunk.astype(float).values)
         coeffs_list.append(coeffs)
@@ -310,8 +312,8 @@ def incrementalPCA_SED(SED_filename, n_components = 20, output_dir = '../outputs
     PCA_PCs = ipca.components_
 
     os.makedirs(output_dir, exist_ok = True)
-    np.savetxt(os.path.join(output_dir, 'PCA_coeffs.csv'), PCA_coeffs, fmt = '%.6e', delimiter = ' ')
-    np.savetxt(os.path.join(output_dir, 'PCA_PCs.csv'), PCA_PCs, fmt = '%.6e', delimiter = ' ')
+    np.savetxt(os.path.join(output_dir, 'PCA_coeffs.csv'), PCA_coeffs, fmt = '%.18e', delimiter = ' ')
+    np.savetxt(os.path.join(output_dir, 'PCA_PCs.csv'), PCA_PCs, fmt = '%.18e', delimiter = ' ')
 
     return PCA_coeffs, PCA_PCs
 
