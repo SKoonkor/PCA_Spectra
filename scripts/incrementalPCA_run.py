@@ -4,7 +4,7 @@ import os, sys
 
 sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
 
-from PCA_cal import PCA_SED, incrementalPCA_SED
+from PCA_cal import incrementalPCA_SED
 
 ############################################################################################
 

@@ -1,13 +1,9 @@
 import numpy as np
-import pandas as pd
-import os, sys
+import sys, os
 
-# Local python libraries
 sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
 
-from FSPS_paramgrid import LHS_generator
-
-
+from FSPS_paramgrid import normal_grid_generator
 
 # Define the grid parameters
 
@@ -17,10 +13,11 @@ FSPS_param_names = ['tage',
 FSPS_param_ranges = np.array([[-5, np.log10(13.7)],
                               [-2.5, 0.5]])
 
+FSPS_param_grid_dim = [225, 225]
+
 FSPS_param_spacings = ['log',
                        'linear']
 
-N_samples = 20000
 
 
 # Show the LHS setup on the screen
@@ -34,16 +31,17 @@ print ('####################################################')
 
 
 
-FSPS_param_values = LHS_generator(FSPS_param_names, 
-                                  FSPS_param_ranges,
-                                  FSPS_param_spacings,
-                                  n_samples = N_samples)
+FSPS_param_values = normal_grid_generator(param_names = FSPS_param_names,
+                                          param_grid_dim = FSPS_param_grid_dim,
+                                          param_ranges = FSPS_param_ranges, 
+                                          param_spacings = FSPS_param_spacings)
+print (FSPS_param_values.shape)
 
 output_dir = '/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/data/'
 os.makedirs(output_dir, exist_ok = True) # Create a data/ directory 
 
 # Save the parameter space to the data directory
-param_grid_output_filename = 'FSPS_param_grid_LHS.csv'
+param_grid_output_filename = 'FSPS_param_grid.csv'
 np.savetxt(output_dir + param_grid_output_filename, FSPS_param_values)
 print ('\nParameter values stored at: \n' + output_dir + param_grid_output_filename)
 
@@ -64,3 +62,4 @@ with open(output_dir + param_spacing_filename, 'w') as f_spacing:
         f_spacing.write('%s\n' %spacing)
 f_spacing.close()
 print ('\nParameter spacings stored at: \n' + output_dir + param_spacing_filename + '\n')
+
