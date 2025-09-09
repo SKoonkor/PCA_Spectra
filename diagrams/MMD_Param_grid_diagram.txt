@@ -1,0 +1,47 @@
+---
+config:
+      theme: neo-dark
+      look: neo
+---
+flowchart TD
+        Start(["Start LHS Script"])
+        Start --> Param[Set param ranges]
+        Param --> |"(Np, )"|ParamRange[Param ranges]
+        ParamRange --> |"(Np, 2)"|ParamSpacing[Param spacings]
+        ParamSpacing --> |"(Np, )"|GridType{"Grid Type?"}
+
+        GridType -- LHS --> N_LHS["Set Ns"]
+        subgraph LatinHypercubSample 
+            N_LHS --> LHS["Call LHS_generator"]
+            LHS --> qmcLHS["Generate Random Points [0, 1) with qmc.LatinHypercub"]
+            qmcLHS --> scaleLHS["Scale the range to Param ranges"]
+
+
+        
+        end
+
+        GridType -- Rect --> N_Rect["Set Nt&Nz"]
+        subgraph Rectangular
+            N_Rect -- Loop over Np --> RectParamRange["Generate Random Point between [min, max)"]
+            RectParamRange -- (N, ) --> RectStoreParam["Store Param"]
+            RectStoreParam -- Repeat until all params process --> RectParamRange
+            
+        end
+
+        scaleLHS --> ParamGrid["Param Grid"]
+        RectParamRange -- Find All Unique Combinations --> ParamGrid
+
+        ParamGrid -- Loop over all parameters --> Paramspacing{"Spacing?"}
+        Paramspacing -- "log" --> logGrid["Calculate 10^(Param values)"]
+        Paramspacing -- "linear" --> linearGrid["Do nothing"]
+        linearGrid --> GridUpdate
+        logGrid --> GridUpdate["Update Param Grid"]
+
+        GridUpdate -- Repeat until all parameters processed --> ParamGrid
+        ParamGrid --> ParamOutput["Save outputs"]
+        ParamOutput --> ParamNameOutput["Save param names"]
+        ParamNameOutput --> ParamRangeOutput["Save param ranges"]
+        ParamRangeOutput --> ParamScalingOutput["Save param scalings"]
+        ParamScalingOutput --> Print["Print output file locations"]
+        Print --> End["End Script"]
+

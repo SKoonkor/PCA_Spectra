@@ -1,0 +1,38 @@
+---
+config:
+  theme: neo-dark
+  look: neo
+---
+flowchart TD
+    A[Start Script] --> B[Load masked wavelengths]
+    B --> C[Set norm_type = 'std']
+    C --> D[Define output filenames]
+    D --> E[Call normalise_SED]
+    subgraph Normalise_SED Function
+        E --> F[Print headers]
+        F --> G[First pass: compute mean and std]
+        G -->|Loop over chunks| H[Read chunk of SEDs]
+        H --> I[Update totals: sum and sum of squares]
+        I --> J[Update row count]
+        J -->|Repeat until all chunks processed| G
+        G --> K[Compute mean_vals and std_vals]
+        K --> L[Second pass: normalise spectra]
+        L --> M[Open output file if given]
+        M -->|Loop over rows in SED file| N[Read row as array]
+        N --> O{norm_type?}
+        O -->|l1/l2| P[Normalize with sklearn preprocessing]
+        O -->|5500A| Q[Divide by flux at 5500Å]
+        O -->|std| R[Subtract mean and divide by std]
+        O -->|else| S[Raise Exception]
+        P --> T[Write row_norm if output_filename]
+        Q --> T
+        R --> T
+        S --> T
+        T -->|Repeat until all rows processed| L
+        L --> U[Close file if open]
+        U --> V[Return]
+    end
+    V --> W[Save outputs]
+    W --> X[Print file locations]
+    X --> Y[End Script]
+
