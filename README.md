@@ -28,8 +28,6 @@ This repository is for essential calculations for reconstruction of synthetic ga
     ```
     $ python3 FSPS_param_grid_generator.py
     ``` 
-## ![alt text](https://github.com/SKoonkor/PCA_Spectra/blob/main/diagrams/fig_Param_grid_diagram.png?raw=true)
-
     ![The workflow of the parameter grid generator](diagrams/fig_Param_grid_diagram.png)
 2. Run the SED template generator.
     ``` 
