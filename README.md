@@ -28,7 +28,7 @@ This repository is for essential calculations for reconstruction of synthetic ga
     ```
     $ python3 FSPS_param_grid_generator.py
     ``` 
-    ![The workflow of the parameter grid generator](diagrams/fig_Param_grid_diagram.png)
+    ![The workflow of the parameter grid generator](diagrams/fig_Paramgrid_diagram.png)
 2. Run the SED template generator.
     ``` 
     $ python3 FSPS_SED_template_generator.py
