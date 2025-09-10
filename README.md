@@ -33,6 +33,7 @@ This repository is for essential calculations for reconstruction of synthetic ga
     ``` 
     $ python3 FSPS_SED_template_generator.py
     ```
+    ![The workflow of the SED template generator](diagrams/fig_SED_generator_diagram.png)
 3. Run the masking step (by applying the wavelength selection) and the normalisation method (preprocessing for PCA).
     ``` 
     $ python3 FSPS_SED_normalisation.py    
