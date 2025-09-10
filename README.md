@@ -41,6 +41,7 @@ This repository is for essential calculations for reconstruction of synthetic ga
     ![The workflow of the normalisation](diagrams/fig_SED_normalisation_diagram.png)
 4. Run the PCA on the normalised SEDs
     ```
-    $ python3 PCA_run.py
+    $ python3 incrementalPCA_run.py
     ```
+    ![The workflow of the incrementalPCA](diagrams/fig_incrementalPCA_diagrams.png)
 5. Interpolate the SED to couple with the SFHs
