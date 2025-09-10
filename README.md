@@ -43,5 +43,5 @@ This repository is for essential calculations for reconstruction of synthetic ga
     ```
     $ python3 incrementalPCA_run.py
     ```
-    ![The workflow of the incrementalPCA](diagrams/fig_incrementalPCA_diagrams.png)
+    ![The workflow of the incrementalPCA](diagrams/fig_incrementalPCA_diagram.png)
 5. Interpolate the SED to couple with the SFHs
