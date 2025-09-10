@@ -37,11 +37,7 @@ This repository is for essential calculations for reconstruction of synthetic ga
     ``` 
     $ python3 FSPS_SED_normalisation.py    
     ```
-    <details>
-    <summary> Show Image </summary>
     ![The workflow of the normalisation](diagrams/fig_SED_normalisation_diagram.png)
-    </details>
-
 4. Run the PCA on the normalised SEDs
     ```
     $ python3 PCA_run.py

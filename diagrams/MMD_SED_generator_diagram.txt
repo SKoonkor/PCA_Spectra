@@ -1,0 +1,39 @@
+---
+config:
+      theme: neo-dark
+      look : neo
+      
+---
+flowchart TD
+      Start["Start SED generator Script"]
+      Start --> StellarPopParams["Define Stellar Pop Params"]
+      StellarPopParams --> SPInit["Call Initializer"]
+      
+      subgraph FSPS Initializer
+
+      SPInit --> SP["SSP model"]
+            
+      end
+
+      
+
+      subgraph FSPS SED Generator
+
+            SP --> SSPparam["Define individual SSP params"]
+            SSPparam -- Loop over param grid --> UpdateSSP["Update SSP params"]
+            
+            
+
+
+            UpdateSSP --> SSPspec["Get SSP Spectrum"]
+            SSPspec --> SSPstore["Store Spectrum"]
+
+            SSPstore -- Repeat for all combinations in param grid --> SSPparam
+      end
+      SSPstore --> OutputSpec["Output Spectra"]
+      SSPspec --First loop--> OutputWave["Output wavelengths"]
+
+      OutputSpec -- (Ns, Nwave) --> PrintOutput["Print Output file locations"]
+      OutputWave -- (Nwave,) --> PrintOutput
+      PrintOutput --> End["End Script"]
+

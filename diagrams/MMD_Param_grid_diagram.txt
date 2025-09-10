@@ -38,7 +38,7 @@ flowchart TD
         logGrid --> GridUpdate["Update Param Grid"]
 
         GridUpdate -- Repeat until all parameters processed --> ParamGrid
-        ParamGrid --> ParamOutput["Save outputs"]
+        ParamGrid -- [Ns, Np] --> ParamOutput["Save outputs"]
         ParamOutput --> ParamNameOutput["Save param names"]
         ParamNameOutput --> ParamRangeOutput["Save param ranges"]
         ParamRangeOutput --> ParamScalingOutput["Save param scalings"]
