@@ -23,8 +23,6 @@ def FSPS_initializer():
     return sp
 
 
-
-
 def FSPS_SED_generator(param_names,
                        param_grid,
                        FSPS_initializer,
