@@ -42,3 +42,5 @@ def plot_SED(ax, wave, SED,
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     
+def plot_SED_vs_SFH():
+    return

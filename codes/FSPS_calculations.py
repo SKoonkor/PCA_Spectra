@@ -8,16 +8,16 @@ import fsps
 
 
 
-def FSPS_initializer():
+def FSPS_initializer(zcontinuous = 1, sfh = 0, logzsol = 0.0):
     # This function initialize the SPS code using the FSPS.StellarPopulation.
     # This SPS has 
     #           NO DUST
     #           NO IGM
     #           NO NEBULAE
     sp = fsps.StellarPopulation(compute_vega_mags = False,
-                                zcontinuous = 1,
-                                sfh = 0,
-                                logzsol = 0.0,
+                                zcontinuous = zcontinuous,
+                                sfh = sfh,
+                                logzsol = logzsol,
                                 add_dust_emission = False,
                                 add_neb_emission = -1,)
     return sp
