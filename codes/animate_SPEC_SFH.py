@@ -75,7 +75,7 @@ galaxies = [
 
 for gal in galaxies:
     gal['SFH'] = build_composite_SFH(t_grid, gal['components'])
-    gal['csp'] = FSPS_initializer(sfh = 3, dust_emission = True, neb_emission = 1)
+    gal['csp'] = FSPS_initializer(sfh = 3, dust_emission = False, neb_emission = 1)
     gal['track'] = {'g-r': [], 'Mr': []}
     gal['mass_formed'] = gal['SFH'] * np.gradient(t_grid)
     gal['cum_mass_formed'] = [np.sum(gal['mass_formed'][:i]) for i in range(200)]
@@ -196,6 +196,6 @@ print ('\nStep 5: Run animation')
 ani = animation.FuncAnimation(fig, animate, frames = range(1, len(t_grid)), interval = 100)
 
 # Save as MP4 (requires ffmpeg installed)
-ani.save('../outputs/MultiGalaxy_SFH_SED.mp4', writer = 'ffmpeg', dpi = 150)
+ani.save('../outputs/MultiGalaxy_SFH_SED_just_neb.mp4', writer = 'ffmpeg', dpi = 150)
 
 plt.show()
