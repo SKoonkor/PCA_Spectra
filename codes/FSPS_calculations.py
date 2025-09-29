@@ -3,6 +3,11 @@ import pandas as pd
 import os
 from scipy.spatial import Delaunay
 from scipy.interpolate import RegularGridInterpolator
+from scipy.constants import c
+
+L_sun_erg_s = 3.828e33 # erg/s
+pc_cm = 3.085677581e18 # cm
+c_ang_per_s = c * 1e10   # speed of light in Angstrom/s
 
 import fsps
 
@@ -201,6 +206,36 @@ def SEDInterpolator_rect(tage_grid, logz_grid, coeff_grid, tage_new, logz_new):
     )
 
     return coeff_new
+
+def spec_LsunA_to_f_lambda(spec_Lsun_per_A, distance_cm = 10*pc_cm):
+    """
+    Convert L (L_sun / Å) -> f_lambda (erg / s / cm^2 / Å) at given distance.
+    distance_cm: distance in cm (e.g. 10*pc_cm for absolute mags; d_L for apparent mags).
+    """
+    L_lambda_erg_per_s_A = spec_Lsun_per_A * L_sun_erg_s           # erg / s / Å
+    f_lambda = L_lambda_erg_per_s_A / (4.0 * np.pi * distance_cm**2) # erg / s / cm^2 / Å
+    return f_lambda
+
+
+def calc_ab_mag(wave, Lsun_per_A, filt_wave, filt_trans):
+    """
+    Compute AB magnitude for an arbitrary spectrum.
+
+    wave, flux_lambda : arrays for spectrum [Angstrom], f_lambda in erg/s/cm^2/Å (or consistent units)
+    filt_wave, filt_trans : arrays for filter [Angstrom], dimensionless transmission curve
+    """
+
+    flux_lambda = spec_LsunA_to_f_lambda(Lsun_per_A)
+    # Interpolate spectrum onto filter grid
+    spec_interp = np.interp(filt_wave, wave, flux_lambda, left=0, right=0)
+
+    # Numerator and denominator of AB flux definition
+    num = np.trapz(spec_interp * filt_trans * filt_wave, filt_wave)
+    denom = np.trapz(filt_trans * c_ang_per_s / filt_wave, filt_wave)
+
+    fnu = num / denom   # in erg/s/cm^2/Hz
+    mag_ab = -2.5 * np.log10(fnu) - 48.6
+    return mag_ab
 
 
 
