@@ -11,14 +11,14 @@ from FSPS_paramgrid import LHS_generator
 
 # Define the grid parameters
 
-FSPS_param_names = ['tage',
-                    'logzsol']
+FSPS_param_names = ['tage']
+# ['logzsol']
 
-FSPS_param_ranges = np.array([[-5, np.log10(13.7)],
-                              [-2.5, 0.5]])
+FSPS_param_ranges = np.array([[-5, np.log10(13.7)]])
+# [-2.5, 0.5])
 
-FSPS_param_spacings = ['log',
-                       'linear']
+FSPS_param_spacings = ['log']
+# ['linear']
 
 N_samples = 20000
 
