@@ -6,7 +6,7 @@ import os, sys
 sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
 
 from FSPS_paramgrid import LHS_generator
-from FSPS_calculations import FSPS_initializer, FSPS_SED_generator
+from FSPS_calculations import FSPS_initializer, FSPS_SED_generator, FSPS_SED_generator_SSP
 
 
 # Script stars here
@@ -33,15 +33,31 @@ with open(data_dir + param_name_filename, 'r') as f_param_names:
         param_grid_names.append(name)
 f_param_names.close()
 
+print ('The number of parameters: ', len(param_grid_names))
+
 # Read the param grid values into an array
 param_grid_values = np.genfromtxt(data_dir + param_grid_filename)
 
-# Generate the SED templates
-FSPS_SED_generator(param_names = param_grid_names,
+if len(param_grid_names):
+    print ('We are only gerenating the SED templates for solar metallicity\n')
+    FSPS_SED_generator_SSP(param_names = param_grid_names,
                    param_grid = param_grid_values,
                    FSPS_initializer = FSPS_initializer(),
                    data_dir = data_dir,
                    output_wave_filename = output_wave_filename,
                    output_SED_template_filename = output_SED_template_filename)
+else:
+    print ('We are generating the full-grid SED templates\n')
+    FSPS_SED_generator(param_names = param_grid_names,
+                   param_grid = param_grid_values,
+                   FSPS_initializer = FSPS_initializer(),
+                   data_dir = data_dir,
+                   output_wave_filename = output_wave_filename,
+                   output_SED_template_filename = output_SED_template_filename)
+
+
+    
+
+# Generate the SED templates
 
 print ('SED TEMPLATE GENERATION COMPLETE')

@@ -78,6 +78,54 @@ def FSPS_SED_generator(param_names,
     np.savetxt(data_dir + output_wave_filename, wave)
     print ('Wavelengths stored at: ' + data_dir + output_wave_filename + '\n')
 
+def FSPS_SED_generator_SSP(param_names,
+                       param_grid,
+                       FSPS_initializer,
+                       data_dir,
+                       output_wave_filename = 'FSPS_wave_SSP.csv',
+                       output_SED_template_filename = 'FSPS_SED_templates_SSP.csv'):
+    # This generates galaxy SEDs based on the Stellar Population code
+    # It calls a FSPS_initializer code, depending on the input
+    #           1. NO DUST?
+    #           2. NO IGM?
+    #           3. NO NEBULAE?
+    print ('\n')
+
+
+    # Initialize the stellar population synthesis code
+    sp = FSPS_initializer
+
+    # Split 'tage' and 'logzsol' from the param_grid
+    tage_grid = param_grid
+    N_samples = len(tage_grid)
+
+    # Generate a SED based on the value of 'tage' and 'logzsol'
+    # And store it in an array SED_templates
+    SED_templates = []
+    for i, age in enumerate(tage_grid):
+        # Update the metalicity of the stellar population
+
+        # Calculate the spectrum of the population at the age 'tage'
+        # 'peraa' kw is True for L_sun/AA, False for L_sun/Hz
+        wave, SED = sp.get_spectrum(tage = age, peraa = True)
+
+        # Add it to the template array
+        SED_templates.append(SED)
+
+
+        # Print the progress on screen
+        Progress = int(i*100/N_samples)
+        if Progress % 2 == 0:
+            print (f'\rGenerating SED {Progress}% complete', end = '', flush = True)
+    SED_templates = np.array(SED_templates)
+
+
+    # Output the SED templates and its corresponding resolution (wavelength information)
+    np.savetxt(data_dir + output_SED_template_filename, SED_templates)
+    print ('\n')
+    print ('SED templates stored at: ' + data_dir + output_SED_template_filename + '\n')
+    np.savetxt(data_dir + output_wave_filename, wave)
+    print ('Wavelengths stored at: ' + data_dir + output_wave_filename + '\n')
 
 class SEDInterpolator:
 
