@@ -236,50 +236,50 @@ def reconstruct_PCA_SED(coeffs, PCs, n_components):
 
 ###### TEST ######
 
-# def PCA_SED(SED, n_components = 20, output_dir = 'outputs/'):
-#     # The SED are dimentionally reduced to n_components
-#     # Instead of using the wavelengths as the vector for the spectra,
-#     # The spectra are projected onto the principal components (PCs)
-#     # The SED instead of represented as F_ij = f_ij * I_j,
-#     # They are described as S = c_ik* PC
-#     # notation: spectrum i-th, wavelentgh j-th.
-# 
-#     print ('\n#################################################')
-#     print ('########### RUNNING PCA ON SPECTRA ##############')
-#     print ('#################################################')
-# 
-# 
-#     # Initiailise the scikit-learn PCA package
-#     print (' Initialising sklearn PCA')
-#     PCA_fn = skPCA(n_components = n_components)
-# 
-#     # Fit the PCA on the SED templates
-#     print ('\n Fitting PCA on SEDs')
-#     PCA_fn.fit(SED)
-# 
-#     # Calculate the coefficient for each SED tempalte and get the eigen vectors (PCs)
-#     print ('\n Getting coeffs and PCs')
-#     PCA_coeffs = PCA_fn.transform(SED)
-#     PCA_PCs = PCA_fn.components_
-#     
-#     print ('\n Writing the output files')
-#     # Define the output filenames
-#     PCA_coeff_filename = 'PCA_coeffs.csv'
-#     PCA_PC_filename = 'PCA_PCs.csv'
-# 
-#     # Create the output directory
-#     os.makedirs(output_dir, exist_ok = True)
-# 
-# 
-#     np.savetxt(output_dir + PCA_coeff_filename, PCA_coeffs)
-#     print ('\n PCA coeffs stored at: ')
-#     print (output_dir + PCA_coeff_filename)
-#     
-#     np.savetxt(output_dir + PCA_PC_filename, PCA_PCs)
-#     print ('\n PCA PCs stored at: ')
-#     print (output_dir + PCA_PC_filename)
-# 
-#     print ('\n PCA RUN COMPLETE')
-#     print ('\n################################################')
-#     
-#     return PCA_coeffs, PCA_PCs
+def PCA_SED(SED, n_components = 20, output_dir = 'outputs/'):
+    # The SED are dimentionally reduced to n_components
+    # Instead of using the wavelengths as the vector for the spectra,
+    # The spectra are projected onto the principal components (PCs)
+    # The SED instead of represented as F_ij = f_ij * I_j,
+    # They are described as S = c_ik* PC
+    # notation: spectrum i-th, wavelentgh j-th.
+
+    print ('\n#################################################')
+    print ('########### RUNNING PCA ON SPECTRA ##############')
+    print ('#################################################')
+
+
+    # Initiailise the scikit-learn PCA package
+    print (' Initialising sklearn PCA')
+    PCA_fn = skPCA(n_components = n_components)
+
+    # Fit the PCA on the SED templates
+    print ('\n Fitting PCA on SEDs')
+    PCA_fn.fit(SED)
+
+    # Calculate the coefficient for each SED tempalte and get the eigen vectors (PCs)
+    print ('\n Getting coeffs and PCs')
+    PCA_coeffs = PCA_fn.transform(SED)
+    PCA_PCs = PCA_fn.components_
+    
+    print ('\n Writing the output files')
+    # Define the output filenames
+    PCA_coeff_filename = 'PCA_coeffs.csv'
+    PCA_PC_filename = 'PCA_PCs.csv'
+
+    # Create the output directory
+    os.makedirs(output_dir, exist_ok = True)
+
+
+    np.savetxt(output_dir + PCA_coeff_filename, PCA_coeffs)
+    print ('\n PCA coeffs stored at: ')
+    print (output_dir + PCA_coeff_filename)
+    
+    np.savetxt(output_dir + PCA_PC_filename, PCA_PCs)
+    print ('\n PCA PCs stored at: ')
+    print (output_dir + PCA_PC_filename)
+
+    print ('\n PCA RUN COMPLETE')
+    print ('\n################################################')
+    
+    return PCA_coeffs, PCA_PCs
