@@ -211,7 +211,8 @@ def denormalise_SED(SED_norm, SED_std, SED_mean):
     # This method can be applied at the very end as a postprocessing step
     # It is define (as simple as):
     #
-    # SED_recon = SED_norm * SED_std + SED_mean.
+    # SED_recon = SED_norm * SED_std + SED_mean,
+    # where SED_norm is the normalised SED, SED_std is the normalisation factor for each SED
     #
 
     print ('\n#################################################')
