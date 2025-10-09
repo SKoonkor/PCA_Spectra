@@ -177,6 +177,50 @@ class SEDInterpolator:
 
         return coeff_interp
 
+def interp_ssp_linear(tage, ages_csv, seds_csv):
+    """
+    Interpolate an SSP spectrum at t_age without loading the full SED grid.
+
+    Parameters
+    ----------
+    tage : float
+        Target age (same units as in ages.csv)
+    ages_csv : str
+        Path to CSV file containing ages (sorted ascending)
+    seds_csv : str
+        Path to CSV file containing SEDs (same order as ages)
+
+    Returns
+    -------
+    ssp_interp : ndarray, shape (n_wavelength, )
+        Interpolated SSP spectrum
+    """
+
+    # Read only the age grid (small)
+    ages = np.loadtxt(ages_csv)
+    seds = np.load(seds_csv)
+ 
+    if tage <= ages[0]:
+        i, j = 0, 0
+        frac = 0.0
+    elif tage >= ages[-1]:
+        i, j = -1, -1
+        frac = 0.0
+    else:
+        i = np.searchsorted(ages, tage) - 1
+        j = i + 1
+        age1, age2 = ages[i], ages[j]
+        frac = (tage - age1) / (age2 - age1)
+    
+    sed1 = seds[i]
+    sed2 = seds[j]
+
+    return sed1 + frac*(sed2 - sed1)
+
+
+
+
+
 def reshape_coeff_grid(params, coeffs):
     """
     Reshape flattened parameter grid into 2D rectangular arrays.

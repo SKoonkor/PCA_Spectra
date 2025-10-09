@@ -14,7 +14,7 @@ from FSPS_paramgrid import LHS_generator
 FSPS_param_names = ['tage']
 # ['logzsol']
 
-FSPS_param_ranges = np.array([[-5, np.log10(13.7)]])
+FSPS_param_ranges = np.array([[-4, np.log10(13.7)]])
 # [-2.5, 0.5])
 
 FSPS_param_spacings = ['log']
@@ -38,6 +38,13 @@ FSPS_param_values = LHS_generator(FSPS_param_names,
                                   FSPS_param_ranges,
                                   FSPS_param_spacings,
                                   n_samples = N_samples)
+
+if len(FSPS_param_names) == 1:
+    FSPS_param_values = FSPS_param_values.transpose()[0]
+    print (FSPS_param_values.shape)
+    order = np.argsort(FSPS_param_values)
+    FSPS_param_values = FSPS_param_values[order]
+    print (FSPS_param_values.shape)
 
 output_dir = '/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/data/'
 os.makedirs(output_dir, exist_ok = True) # Create a data/ directory 

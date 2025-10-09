@@ -7,6 +7,7 @@ import os, sys
 sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
 from visualisations import plot_SED
 from PCA_cal import denormalise_SED, reconstruct_PCA_SED
+from FSPS_calculations import interp_ssp_linear
 
 # Define essential directories
 data_dir = '../data/'
@@ -45,6 +46,7 @@ SED_original = pd.read_csv(SED_original_filename,
                               header=None,
                               sep='\s+',
                               nrows = chunk_size).to_numpy()
+print (SED_original.shape)
 ####
 # The normalised spectra
 SED_norm = pd.read_csv(SED_norm_filename, 
