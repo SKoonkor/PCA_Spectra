@@ -3,3 +3,5 @@ data/
 outputs/
 test_results/
 test/
+PCA_venv/
+
