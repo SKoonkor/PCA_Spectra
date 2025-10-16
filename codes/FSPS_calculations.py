@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import os
+import os, sys
 from scipy.spatial import Delaunay
 from scipy.interpolate import RegularGridInterpolator
 from scipy.constants import c
@@ -9,6 +9,10 @@ L_sun_erg_s = 3.828e33 # erg/s
 pc_cm = 3.085677581e18 # cm
 c_ang_per_s = c * 1e10   # speed of light in Angstrom/s
 
+
+SPS_PATH = "/Users/suteepornz/Documents/Suttikoon/SEDFitting/fsps"
+os.environ["SPS_HOME"] = SPS_PATH
+sys.path.append(SPS_PATH)
 import fsps
 
 
