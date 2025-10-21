@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 
-######################################################################################################
+####################################################################################################
 
 def t_ssp_log(t_SFH_grid):
     '''
@@ -17,17 +17,15 @@ def t_ssp_log(t_SFH_grid):
                                                       np.log10(max(t_SFH_grid) - min(t_SFH_grid)), 
                                                       30, 
                                                       endpoint = True))
-def t_ssp_linear(t_SFH_grid):
+def t_ssp_linear(t_SFH_grid, n_steps = 20):
     '''
     This function provides the time steps for the SSP age grid.
     The output is in linear scale, to focus on the average SFR at different time steps.
     '''
     return max(t_SFH_grid) - min(t_SFH_grid) - np.linspace(0, 
                                                            max(t_SFH_grid) - min(t_SFH_grid), 
-                                                           30, 
+                                                           n_steps, 
                                                            endpoint = True)
-
-
 def SFH_tau(t, T0, tau):
     '''
     This function returns the exponential declining (tau) SFH based on the time table provided.
@@ -232,6 +230,58 @@ def mass_formed_grid(sfr_ts, sfr_vals, age_edges, *, verbose = False):
     mass_bins = mass_bins_temp[::-1] if descending else mass_bins_temp
     return mass_bins
 
+def average_SFR(SFH, SFH_time_grid, t1, t2):
+    """
+    Compute the average SFR between the time cosmic time t1 and t2
+    The t1 and t2 are referred to the time after when the star formation begins.
+    Users must be very careful of the input.
+
+    This is for calculting the mass formed between those times (but in the Composite
+    Stellar Population calculation code).
+
+    sfr_avg = [sfr(t1) + sfr(t2)] / 2.
+
+    However, the sfr at t1 and t2 might not be available. We will have to interpolate the 
+    SFH to get the rates at these time.
+    """
+
+    sfr1 = np.interp(t1, SFH_time_grid, SFH)
+    sfr2 = np.interp(t2, SFH_time_grid, SFH)
+    sfr_avg = (sfr1 + sfr2)/2 
+
+    return sfr_avg
+
+
+def mass_formed_between(SFH, SFH_time_grid, CSP_age_grid):
+    """
+    Calculate the amount of stellar mass formed between each time grid used for the CSP calculation
+    This function also outputs the age of SSP for each 'mass formed' bin.
+
+    mass_form_i = [(sfr1 + sfr2)/2] * abs(t1 - t2)
+    """
+    mass_formed = []
+    SSP_age = []
+
+    time_grid_shifted = min(SFH_time_grid) + CSP_age_grid
+    print (CSP_age_grid)
+
+    for i in range(len(CSP_age_grid) - 1):
+        t1 = time_grid_shifted[i]
+        t2 = time_grid_shifted[i+1]
+
+        mass_formed_i = average_SFR(SFH, SFH_time_grid, t1, t2)*abs(t1 - t2)
+
+        mass_formed.append(mass_formed_i)
+        SSP_age.append(CSP_age_grid[i])
+        
+    mass_formed = np.asarray(mass_formed)
+    SSP_age = np.asarray(SSP_age)
+    
+    print (SSP_age)
+    print (mass_formed)
+    print (len(mass_formed))
+    print (len(SSP_age))
+    return mass_formed, SSP_age
 
 
 ############################################
