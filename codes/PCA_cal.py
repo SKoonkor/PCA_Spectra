@@ -284,3 +284,6 @@ def PCA_SED(SED, n_components = 20, output_dir = 'outputs/'):
     print ('\n################################################')
     
     return PCA_coeffs, PCA_PCs
+
+def test_fn():
+    return 0
