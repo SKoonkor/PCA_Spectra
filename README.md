@@ -28,20 +28,28 @@ This repository is for essential calculations for reconstruction of synthetic ga
     ```
     $ python3 FSPS_param_grid_generator.py
     ``` 
+    <!-- 
     ![The workflow of the parameter grid generator](diagrams/fig_Paramgrid_diagram.png)
+    -->
 2. Run the SED template generator.
     ``` 
     $ python3 FSPS_SED_template_generator.py
     ```
+    <!-- 
     ![The workflow of the SED template generator](diagrams/fig_SED_generator_diagram.png)
+    -->
 3. Run the masking step (by applying the wavelength selection) and the normalisation method (preprocessing for PCA).
     ``` 
     $ python3 FSPS_SED_normalisation.py    
     ```
+    <!-- 
     ![The workflow of the normalisation](diagrams/fig_SED_normalisation_diagram.png)
+    -->
 4. Run the PCA on the normalised SEDs
     ```
     $ python3 incrementalPCA_run.py
     ```
+    <!-- 
     ![The workflow of the incrementalPCA](diagrams/fig_incrementalPCA_diagram.png)
+    -->
 5. Interpolate the SED to couple with the SFHs
