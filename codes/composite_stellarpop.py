@@ -8,14 +8,14 @@ import matplotlib.pyplot as plt
 
 ####################################################################################################
 
-def t_ssp_log(t_SFH_grid):
+def t_ssp_log(t_SFH_grid, n_steps = 20):
     '''
     This function provides the time steps for the SSP age grid.
     The output is in log scale, to focus on the young stellar population that just recently form
     '''
     return max(t_SFH_grid) - min(t_SFH_grid) - np.append(0, np.logspace(-2, 
                                                       np.log10(max(t_SFH_grid) - min(t_SFH_grid)), 
-                                                      30, 
+                                                      n_steps, 
                                                       endpoint = True))
 def t_ssp_linear(t_SFH_grid, n_steps = 20):
     '''
@@ -263,7 +263,7 @@ def mass_formed_between(SFH, SFH_time_grid, CSP_age_grid):
     SSP_age = []
 
     time_grid_shifted = min(SFH_time_grid) + CSP_age_grid
-    print (CSP_age_grid)
+#     print (CSP_age_grid)
 
     for i in range(len(CSP_age_grid) - 1):
         t1 = time_grid_shifted[i]
@@ -277,10 +277,10 @@ def mass_formed_between(SFH, SFH_time_grid, CSP_age_grid):
     mass_formed = np.asarray(mass_formed)
     SSP_age = np.asarray(SSP_age)
     
-    print (SSP_age)
-    print (mass_formed)
-    print (len(mass_formed))
-    print (len(SSP_age))
+#     print (SSP_age)
+#     print (mass_formed)
+#     print (len(mass_formed))
+#     print (len(SSP_age))
     return mass_formed, SSP_age
 
 
