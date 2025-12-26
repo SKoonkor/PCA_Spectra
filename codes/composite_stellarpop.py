@@ -26,6 +26,11 @@ def t_ssp_linear(t_SFH_grid, n_steps = 20):
                                                            max(t_SFH_grid) - min(t_SFH_grid), 
                                                            n_steps, 
                                                            endpoint = True)
+
+##
+# The functions below are used for calculating the star formation histories, 
+# using different parametric forms.
+
 def SFH_tau(t, T0, tau):
     '''
     This function returns the exponential declining (tau) SFH based on the time table provided.
@@ -156,6 +161,11 @@ def build_composite_SFH(t, components):
     
     return sfr_norm
 
+
+
+##
+# THe function below is used for combining different SFHs to produce the SFH of a CSP
+
 def mass_formed_grid(sfr_ts, sfr_vals, age_edges, *, verbose = False):
     '''
     Compute stellar mass formed between each age bin for a CSP.
@@ -229,6 +239,15 @@ def mass_formed_grid(sfr_ts, sfr_vals, age_edges, *, verbose = False):
 
     mass_bins = mass_bins_temp[::-1] if descending else mass_bins_temp
     return mass_bins
+
+def SFR_interp(time, SFH_time_table, SFH_sfr_table):
+    """
+    This function interpolates the star formation rate 
+    from the input star formation history using a linear 
+    interpolation"""
+    
+    return np.interp(time, SFH_time_table, SFH_sfr_table)
+
 
 def average_SFR(SFH, SFH_time_grid, t1, t2):
     """
