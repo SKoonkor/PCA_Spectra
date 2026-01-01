@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy.interpolate import inter1d
 import os, sys
 
 import matplotlib.pyplot as plt
@@ -240,13 +241,27 @@ def mass_formed_grid(sfr_ts, sfr_vals, age_edges, *, verbose = False):
     mass_bins = mass_bins_temp[::-1] if descending else mass_bins_temp
     return mass_bins
 
+# def SFR_interp(time, SFH_time_table, SFH_sfr_table):
+#     """
+#     This function interpolates the star formation rate 
+#     from the input star formation history using a linear 
+#     interpolation"""
+    
+#     return np.interp(time, SFH_time_table, SFH_sfr_table)
+
 def SFR_interp(time, SFH_time_table, SFH_sfr_table):
     """
     This function interpolates the star formation rate 
     from the input star formation history using a linear 
     interpolation"""
     
-    return np.interp(time, SFH_time_table, SFH_sfr_table)
+    f = interp1d(
+    SFH_time_table, SFH_sfr_table,
+    bounds_error=False,
+    fill_value=0.0
+)
+    
+    return f(time)
 
 
 def average_SFR(SFH, SFH_time_grid, t1, t2):
