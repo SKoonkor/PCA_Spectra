@@ -5,17 +5,11 @@ import matplotlib.pyplot as plt
 from astropy.cosmology import FlatLambdaCDM, z_at_value
 from scipy.interpolate import interp1d
 
-# =============================================================================
 # COSMOLOGY
-# =============================================================================
-
 cosmo = FlatLambdaCDM(H0=67.8, Om0=0.307, Ob0=0.0483)
 
 
-# =============================================================================
 # COSMOLOGICAL UTILITIES
-# =============================================================================
-
 def z_to_a(z):
     """Redshift -> scale factor"""
     return 1.0 / (1.0 + z)
@@ -55,11 +49,7 @@ def universe_grid_generator(z_init=127, z_final=0, n_snapshots=271):
     z_grid  = a_to_z(a_grid)
     return z_to_age(z_grid)
 
-
-# =============================================================================
 # SFH UTILITIES
-# =============================================================================
-
 def sfr_interpolator(sfh_time, sfh_sfr):
     """
     Build a linear interpolator for the SFR(t) curve.
@@ -80,10 +70,7 @@ def sfr_interpolator(sfh_time, sfh_sfr):
                     kind='linear', bounds_error=False, fill_value=0.0)
 
 
-# =============================================================================
-# CSP SED CALCULATOR  (the core routine)
-# =============================================================================
-
+# CSP SED CALCULATOR
 def build_csp_sed(sfh_time, sfh_sfr, t_obs,
                   ssp_ages, ssp_seds,
                   min_ssp_age=0.0):
@@ -145,9 +132,7 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     ssp_ages = np.asarray(ssp_ages, dtype=float)
     ssp_seds = np.asarray(ssp_seds, dtype=float)
 
-    # ------------------------------------------------------------------
     # 1. Sort and clip the SFH to [0, t_obs]
-    # ------------------------------------------------------------------
     order    = np.argsort(sfh_time)
     t_sorted = sfh_time[order]
     s_sorted = sfh_sfr[order]
@@ -162,7 +147,6 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     t_grid  = np.append(t_clip,  t_obs)
     sfr_grid = np.append(s_clip, sfr_interp(t_obs))
 
-    # ------------------------------------------------------------------
     # 2. Trapezoidal mass in each bin  [M_sun]
     #
     #    delta_M_i = 0.5 * (SFR_{i+1} + SFR_i) * delta_t_i
@@ -174,7 +158,6 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     sfr_avg    = 0.5 * (sfr_grid[1:] + sfr_grid[:-1])  # M_sun / yr
     mass_bins  = sfr_avg * delta_t * 1e9    # M_sun
 
-    # ------------------------------------------------------------------
     # 3. SSP age for each bin  [Gyr]
     #
     #    The representative cosmic time of bin i is the bin MIDPOINT:
@@ -192,7 +175,6 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     # Clip ages to the SSP template range to avoid extrapolation artefacts
     tau_bins  = np.clip(tau_bins, ssp_ages[0], ssp_ages[-1])
 
-    # ------------------------------------------------------------------
     # 4. Accumulate CSP SED
     #
     #    F_CSP(lambda) = sum_i  delta_M_i  *  SSP(lambda, tau_i)
@@ -209,10 +191,7 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     return csp_sed, t_grid, sfr_grid, mass_bins
 
 
-# =============================================================================
-# SSP INTERPOLATION  (internal helper)
-# =============================================================================
-
+# SSP INTERPOLATION
 def _interpolate_ssp(tau, ssp_ages, ssp_seds):
     """
     Linearly interpolate the SSP SED grid at age tau.
@@ -240,10 +219,7 @@ def _interpolate_ssp(tau, ssp_ages, ssp_seds):
     return (1.0 - w) * ssp_seds[i] + w * ssp_seds[j]
 
 
-# =============================================================================
 # SANITY CHECK HELPER
-# =============================================================================
-
 def check_total_mass(mass_bins, sfh_time, sfh_sfr, t_obs):
     """
     Cross-check the trapezoidal mass sum against a direct numpy trapz
@@ -262,13 +238,8 @@ def check_total_mass(mass_bins, sfh_time, sfh_sfr, t_obs):
     print(f"  Mass from np.trapz : {M_direct:.4e} M_sun")
     print(f"  Ratio              : {M_bins/M_direct:.6f}  (should be ~1)")
 
-
-# =============================================================================
 # MAIN  –  example usage
-# =============================================================================
-
 if __name__ == "__main__":
-
     # --- Load data -----------------------------------------------------------
     wave = np.genfromtxt('./../data/FSPS_wave.csv')
 
