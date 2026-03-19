@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from astropy.cosmology import FlatLambdaCDM, z_at_value
 from scipy.interpolate import interp1d
 
+import fsps
+
 # COSMOLOGY
 cosmo = FlatLambdaCDM(H0=67.8, Om0=0.307, Ob0=0.0483)
 
@@ -132,7 +134,7 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     ssp_ages = np.asarray(ssp_ages, dtype=float)
     ssp_seds = np.asarray(ssp_seds, dtype=float)
 
-    # 1. Sort and clip the SFH to [0, t_obs]
+    # Sort and clip the SFH to [0, t_obs]
     order    = np.argsort(sfh_time)
     t_sorted = sfh_time[order]
     s_sorted = sfh_sfr[order]
@@ -147,7 +149,7 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     t_grid  = np.append(t_clip,  t_obs)
     sfr_grid = np.append(s_clip, sfr_interp(t_obs))
 
-    # 2. Trapezoidal mass in each bin  [M_sun]
+    # Trapezoidal mass in each bin  [M_sun]
     #
     #    delta_M_i = 0.5 * (SFR_{i+1} + SFR_i) * delta_t_i
     #
@@ -158,7 +160,7 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     sfr_avg    = 0.5 * (sfr_grid[1:] + sfr_grid[:-1])  # M_sun / yr
     mass_bins  = sfr_avg * delta_t * 1e9    # M_sun
 
-    # 3. SSP age for each bin  [Gyr]
+    # SSP age for each bin  [Gyr]
     #
     #    The representative cosmic time of bin i is the bin MIDPOINT:
     #        t_mid_i = 0.5 * (t_{i+1} + t_i)
@@ -175,7 +177,7 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     # Clip ages to the SSP template range to avoid extrapolation artefacts
     tau_bins  = np.clip(tau_bins, ssp_ages[0], ssp_ages[-1])
 
-    # 4. Accumulate CSP SED
+    # Accumulate CSP SED
     #
     #    F_CSP(lambda) = sum_i  delta_M_i  *  SSP(lambda, tau_i)
     # ------------------------------------------------------------------
@@ -218,7 +220,6 @@ def _interpolate_ssp(tau, ssp_ages, ssp_seds):
     w = (tau - ssp_ages[i]) / (ssp_ages[j] - ssp_ages[i])  # 0 <= w <= 1
     return (1.0 - w) * ssp_seds[i] + w * ssp_seds[j]
 
-
 # SANITY CHECK HELPER
 def check_total_mass(mass_bins, sfh_time, sfh_sfr, t_obs):
     """
@@ -238,6 +239,44 @@ def check_total_mass(mass_bins, sfh_time, sfh_sfr, t_obs):
     print(f"  Mass from np.trapz : {M_direct:.4e} M_sun")
     print(f"  Ratio              : {M_bins/M_direct:.6f}  (should be ~1)")
 
+
+def _get_metallicity(Z, SFH_time):
+    """
+    Generate the tabulated metallicity as a function of universe time for the FSPS code
+    """
+    Z_solar = 0.019
+    if Z == "solar":
+        return np.array([Z_solar]*len(SFH_time))
+    elif type(Z) in [float, int]:
+        return Z*np.ones(len(SFH_time))
+    elif len(Z) == len(SFH_time):
+        return np.asarray(Z)
+    else:
+        raise ValueError("Z should be 'solar' or float/int or list (same len as SFH_time)")
+
+
+# Direct FSPS calculation of CSP SED
+def direct_fsps(SFH_time, SFH_sfr, Z = "solar"):
+    """ 
+    Calculate the CSP SED directly using FSPS code (as a benchmark of the main calculation)
+    """
+
+    print ("\nLaunching FSPS")
+
+    sp = fsps.StellarPopulation(compute_vega_mags=False,
+                                zcontinuous=3,
+                                sfh=3,)
+    Z_array = _get_metallicity(Z, SFH_time)
+
+    sp.set_tabular_sfh(age = SFH_time, sfr = SFH_sfr, Z = Z_array)
+
+    # Calculate CSP SED
+    wave, spec = sp.get_spectrum(tage = max(SFH_time), peraa = True)
+
+    return wave, spec
+
+
+
 # MAIN  –  example usage
 if __name__ == "__main__":
     # --- Load data -----------------------------------------------------------
@@ -255,58 +294,75 @@ if __name__ == "__main__":
     # --- Load SFH ------------------------------------------------------------
     SFH_input = np.genfromtxt('./../data/GALFORM_SFHs/gal_1_SFH_test.csv')
     order     = np.argsort(SFH_input[0])
-    SFH_time  = SFH_input[0][order]           # Gyr (cosmic time)
-    SFH_sfr   = 10 ** SFH_input[1][order]     # M_sun / yr  (log -> linear)
+    SFH_input_time  = SFH_input[0][order]           # Gyr (cosmic time)
+    SFH_input_sfr   = 10 ** SFH_input[1][order]     # M_sun / yr  (log -> linear)
+
+    # --- GALFORM grid --------------------------------------------------------
+    SFH_time = universe_grid_generator() # GALFORM time grid
+    SFH_sfr = sfr_interpolator(SFH_input_time, SFH_input_sfr)(SFH_time) # interpolated SFR
 
     # --- Observation epoch ---------------------------------------------------
-    Galaxy_lookback_time     = 5.0                              # Gyr
-    t_universe_today         = z_to_age(0)                     # ~13.8 Gyr
-    t_obs                    = t_universe_today - Galaxy_lookback_time
-
-    print(f"\nUniverse age today : {t_universe_today:.4f} Gyr")
-    print(f"t_obs (galaxy)     : {t_obs:.4f} Gyr")
-
-    # --- Compute CSP SED -----------------------------------------------------
-    csp_sed, t_grid, sfr_grid, mass_bins = build_csp_sed(
-        SFH_time, SFH_sfr, t_obs,
-        ssp_ages, ssp_seds
-    )
-
-    # --- Sanity check: total stellar mass ------------------------------------
-    print("\n--- Mass sanity check ---")
-    check_total_mass(mass_bins, SFH_time, SFH_sfr, t_obs)
-
-    # --- Plot ----------------------------------------------------------------
-    fig, axes = plt.subplots(3, 1, figsize=(10, 12))
-
-    # 1. SFH
-    ax = axes[0]
-    ax.plot(t_grid, sfr_grid, 'k-o', ms=3)
-    ax.set_xlabel("Cosmic time (Gyr)")
-    ax.set_ylabel(r"SFR ($M_\odot$ yr$^{-1}$)")
-    ax.set_title("Star Formation History")
-    ax.set_yscale('log')
-
-    # 2. Mass per bin
-    ax = axes[1]
-    t_mid = 0.5 * (t_grid[1:] + t_grid[:-1])
-    ax.bar(t_mid, mass_bins, width=np.diff(t_grid), align='center',
-           color='steelblue', edgecolor='k', linewidth=0.4)
-    ax.set_xlabel("Cosmic time (Gyr)")
-    ax.set_ylabel(r"$\Delta M$ ($M_\odot$)")
-    ax.set_title("Stellar Mass Formed per Bin")
-
-    # 3. CSP SED
-    ax = axes[2]
-    ax.plot(wave, csp_sed, 'b-', lw=1.2, label='CSP SED (midpoint)')
-    ax.set_xlabel(r"Wavelength ($\AA$)")
-    ax.set_ylabel(r"Luminosity ($L_\odot\,\AA^{-1}$)")
-    ax.set_title("Composite Stellar Population SED")
-    ax.set_xscale('log')
-    ax.set_yscale('log')
-    ax.legend()
-
-    plt.tight_layout()
-    plt.savefig('./../data/csp_sed_output.png', dpi=150)
-    plt.show()
-    print("\nDone. Figure saved.")
+    Galaxy_lb_list = [0, 1, 2, 4, 6, 8, 10, 13] # Gyr
+    for gal_lb in Galaxy_lb_list:
+        print ("--------------------------------------------------------------\n") 
+        print (f"Calculating CSP SED (t_lookback = {gal_lb} Gyr")
+        Galaxy_lookback_time     = gal_lb                              
+        t_universe_today         = z_to_age(0)                     # ~13.8 Gyr
+        t_obs                    = t_universe_today - Galaxy_lookback_time
+    
+        print(f"\nUniverse age today : {t_universe_today:.4f} Gyr")
+        print(f"t_obs (galaxy)     : {t_obs:.4f} Gyr")
+    
+        # --- Compute CSP SED -----------------------------------------------------
+        csp_sed, t_grid, sfr_grid, mass_bins = build_csp_sed(
+            SFH_time, SFH_sfr, t_obs,
+            ssp_ages, ssp_seds
+        )
+    
+    
+        # --- Sanity check: total stellar mass ------------------------------------
+        print("\n--- Mass sanity check ---")
+        check_total_mass(mass_bins, SFH_time, SFH_sfr, t_obs)
+    
+    
+        # --- Direct FSPS ---------------------------------------------------------
+        csp_FSPS = direct_fsps(t_grid, sfr_grid) 
+    
+        # --- Plot ----------------------------------------------------------------
+        fig, axes = plt.subplots(3, 1, figsize=(10, 12))
+    
+        # 1. SFH
+        ax = axes[0]
+        ax.plot(t_grid, sfr_grid, 'k-o', ms=3)
+        ax.plot(SFH_input_time, SFH_input_sfr, color='grey', alpha = 0.5)
+        ax.set_xlim(0, 14)
+        ax.set_xlabel("Cosmic time (Gyr)")
+        ax.set_ylabel(r"SFR ($M_\odot$ yr$^{-1}$)")
+        ax.set_title("Star Formation History")
+        ax.set_yscale('log')
+    
+        # 2. Mass per bin
+        ax = axes[1]
+        t_mid = 0.5 * (t_grid[1:] + t_grid[:-1])
+        ax.bar(t_mid, mass_bins, width=np.diff(t_grid), align='center',
+               color='steelblue', edgecolor='k', linewidth=0.4)
+        ax.set_xlim(0, 14)
+        ax.set_xlabel("Cosmic time (Gyr)")
+        ax.set_ylabel(r"$\Delta M$ ($M_\odot$)")
+        ax.set_title("Stellar Mass Formed per Bin")
+    
+        # 3. CSP SED
+        ax = axes[2]
+        ax.plot(wave, csp_sed, 'b-', lw=1.2, label='CSP SED (midpoint)')
+        ax.plot(csp_FSPS[0], csp_FSPS[1], 'r-.', lw = 3, label = 'CSP SED (direct FSPS)') 
+        ax.set_xlabel(r"Wavelength ($\AA$)")
+        ax.set_ylabel(r"Luminosity ($L_\odot\,\AA^{-1}$)")
+        ax.set_title("Composite Stellar Population SED")
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.legend()
+    
+        plt.tight_layout()
+        plt.savefig(f'./../data/csp_sed_output_{gal_lb}.png', dpi=150)
+        # plt.show()
+        print("\nDone. Figure saved.")
