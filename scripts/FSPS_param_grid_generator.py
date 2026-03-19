@@ -3,7 +3,7 @@ import pandas as pd
 import os, sys
 
 # Local python libraries
-sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
+sys.path.append('./../codes')
 
 from FSPS_paramgrid import LHS_generator
 
@@ -46,7 +46,7 @@ if len(FSPS_param_names) == 1:
     FSPS_param_values = FSPS_param_values[order]
     print (FSPS_param_values.shape)
 
-output_dir = '/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/data/'
+output_dir = './../data/'
 os.makedirs(output_dir, exist_ok = True) # Create a data/ directory 
 
 # Save the parameter space to the data directory

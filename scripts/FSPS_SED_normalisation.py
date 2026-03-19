@@ -3,13 +3,13 @@ import pandas as pd
 import os, sys
 
 # Local python libraries
-sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
+sys.path.append('./../codes')
 from PCA_cal import mask_SED, normalise_SED, normalise_SED_twopass 
 
 
 ############################################################################################
 #### Script starts here
-data_dir = '../data/'
+data_dir = './../data/'
 os.makedirs(data_dir, exist_ok = True)
 wave_filename = 'FSPS_wave.csv'
 SED_filename = 'FSPS_SED_templates.csv'

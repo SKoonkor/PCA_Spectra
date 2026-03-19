@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os, sys
 
-sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
+sys.path.append('./../codes')
 
 from PCA_cal import PCA_SED
 

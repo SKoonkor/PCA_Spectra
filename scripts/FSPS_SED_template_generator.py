@@ -3,7 +3,7 @@ import pandas as pd
 import os, sys
 
 # Local python libraries
-sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
+sys.path.append('./../codes')
 
 from FSPS_paramgrid import LHS_generator
 from FSPS_calculations import FSPS_initializer, FSPS_SED_generator, FSPS_SED_generator_SSP
@@ -12,7 +12,7 @@ from FSPS_calculations import FSPS_initializer, FSPS_SED_generator, FSPS_SED_gen
 # Script stars here
 
 # Define filenames and directory for storing SED template information
-data_dir = '/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/data/'
+data_dir = './../data/'
 os.makedirs(data_dir, exist_ok = True)
 
 # Input files

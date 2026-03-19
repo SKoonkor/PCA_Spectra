@@ -4,14 +4,14 @@ import itertools
 import pandas as pd
 import os, sys
 
-sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
+sys.path.append('./../codes')
 from visualisations import plot_SED
 from PCA_cal import denormalise_SED, reconstruct_PCA_SED
 from FSPS_calculations import interp_ssp_linear
 
 # Define essential directories
-data_dir = '../data/'
-output_dir = '../outputs/'
+data_dir = './../data/'
+output_dir = './../outputs/'
 
 # Define data/output filenames
 wave_original_filename = data_dir + 'FSPS_wave.csv'

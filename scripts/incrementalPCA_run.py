@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 import os, sys
 
-sys.path.append('/Users/suteepornz/Documents/Suttikoon/Research_Projects/PCA_Spectra/codes')
+sys.path.append('./../codes')
 
 from PCA_cal import incrementalPCA_SED
 
 ############################################################################################
 
 #### Define the input filenames
-data_dir  = '../data/'
+data_dir  = './../data/'
 wave_filename = 'FSPS_wave_norm_std.csv'
 SED_norm_filename = 'FSPS_SED_norm_std.csv'
 
@@ -21,7 +21,7 @@ SED_norm_filename = 'FSPS_SED_norm_std.csv'
 ###########################################################################################
 
 #### Define the output directory
-output_dir = '../outputs/'
+output_dir = './../outputs/'
 
 #### RUN PCA on SEDs
 
