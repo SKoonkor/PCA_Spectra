@@ -153,7 +153,7 @@ def normalise_SED(wave, SED_filename, norm_type = 'std', eps = 0, chunk_size = 1
 
 
 
-def incrementalPCA_SED(SED_filename, n_components = 20, output_dir = '../outputs/', chunk_size = 2000):
+def incrementalPCA_SED(SED_filename, n_components = 20, output_dir = './../outputs/', chunk_size = 2000):
     '''
     Perform PCA (Incremental) on SED templates with reduced memory usage.
 
