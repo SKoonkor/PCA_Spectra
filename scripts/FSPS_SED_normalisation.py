@@ -4,7 +4,7 @@ import os, sys
 
 # Local python libraries
 sys.path.append('./../codes')
-from PCA_cal import mask_SED, normalise_SED, normalise_SED_twopass 
+from PCA_cal import mask_SED, normalise_SED
 
 
 ############################################################################################

@@ -75,7 +75,8 @@ def sfr_interpolator(sfh_time, sfh_sfr):
 # CSP SED CALCULATOR
 def build_csp_sed(sfh_time, sfh_sfr, t_obs,
                   ssp_ages, ssp_seds,
-                  min_ssp_age=0.0):
+                  min_ssp_age=0.0,
+                  bin_position="middle"):
     """
     Compute a composite stellar population (CSP) SED by convolving
     a star formation history with a grid of SSP templates.
@@ -171,8 +172,18 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
     #    rule (it is exact for linear SFR variation within the bin).
     #    Front/back are first-order and disagree when bins are wide.
     # ------------------------------------------------------------------
-    t_mid     = 0.5 * (t_grid[1:] + t_grid[:-1])  # cosmic time of bin midpoint
-    tau_bins  = t_obs - t_mid                       # SSP age = lookback time (Gyr)
+
+    # cosmic time of bin position 
+    if bin_position == "middle":
+        t_i = 0.5 * (t_grid[1:] + t_grid[:-1]) 
+    elif bin_position == "front":
+        t_i = t_grid[:-1]
+    elif bin_position == "back":
+        t_i = t_grid[1:]
+    else:
+        raise ValueError("bin_position should be 'front', 'middle', or 'back'")
+
+    tau_bins  = t_obs - t_i                       # SSP age = lookback time (Gyr)
 
     # Clip ages to the SSP template range to avoid extrapolation artefacts
     tau_bins  = np.clip(tau_bins, ssp_ages[0], ssp_ages[-1])
@@ -240,33 +251,38 @@ def check_total_mass(mass_bins, sfh_time, sfh_sfr, t_obs):
     print(f"  Ratio              : {M_bins/M_direct:.6f}  (should be ~1)")
 
 
-def _get_metallicity(Z, SFH_time):
+def _get_metallicity(Z, n):
     """
     Generate the tabulated metallicity as a function of universe time for the FSPS code
     """
     Z_solar = 0.019
     if Z == "solar":
-        return np.array([Z_solar]*len(SFH_time))
-    elif type(Z) in [float, int]:
-        return Z*np.ones(len(SFH_time))
-    elif len(Z) == len(SFH_time):
+        return np.full(n, float(Z_solar))
+    elif isinstance(Z, (float, int)):
+        return np.full(n, float(Z))
+    elif len(Z) == n:
         return np.asarray(Z)
     else:
-        raise ValueError("Z should be 'solar' or float/int or list (same len as SFH_time)")
+        raise ValueError("Z should be 'solar' or float/int or an array matching the time grid")
 
 
 # Direct FSPS calculation of CSP SED
-def direct_fsps(SFH_time, SFH_sfr, Z = "solar"):
+def direct_fsps(SFH_cosmic_time, SFH_sfr, Z = "solar"):
     """ 
     Calculate the CSP SED directly using FSPS code (as a benchmark of the main calculation)
     """
 
     print ("\nLaunching FSPS")
 
+    SFH_cosmic_time = np.asarray(SFH_cosmic_time, dtype = float)
+    SFH_sfr = np.asarray(SFH_sfr, dtype = float)
+
+    
+
     sp = fsps.StellarPopulation(compute_vega_mags=False,
                                 zcontinuous=3,
                                 sfh=3,)
-    Z_array = _get_metallicity(Z, SFH_time)
+    Z_array = _get_metallicity(Z, len(SFH_time))
 
     sp.set_tabular_sfh(age = SFH_time, sfr = SFH_sfr, Z = Z_array)
 
@@ -303,9 +319,10 @@ if __name__ == "__main__":
 
     # --- Observation epoch ---------------------------------------------------
     Galaxy_lb_list = [0, 1, 2, 4, 6, 8, 10, 13] # Gyr
+    Cal_direct_FSPS = True
     for gal_lb in Galaxy_lb_list:
         print ("--------------------------------------------------------------\n") 
-        print (f"Calculating CSP SED (t_lookback = {gal_lb} Gyr")
+        print (f"Calculating CSP SED (t_lookback = {gal_lb} Gyr)")
         Galaxy_lookback_time     = gal_lb                              
         t_universe_today         = z_to_age(0)                     # ~13.8 Gyr
         t_obs                    = t_universe_today - Galaxy_lookback_time
@@ -326,7 +343,8 @@ if __name__ == "__main__":
     
     
         # --- Direct FSPS ---------------------------------------------------------
-        csp_FSPS = direct_fsps(t_grid, sfr_grid) 
+        if Cal_direct_FSPS:
+            csp_FSPS = direct_fsps(t_grid, sfr_grid) 
     
         # --- Plot ----------------------------------------------------------------
         fig, axes = plt.subplots(3, 1, figsize=(10, 12))
@@ -354,7 +372,8 @@ if __name__ == "__main__":
         # 3. CSP SED
         ax = axes[2]
         ax.plot(wave, csp_sed, 'b-', lw=1.2, label='CSP SED (midpoint)')
-        ax.plot(csp_FSPS[0], csp_FSPS[1], 'r-.', lw = 3, label = 'CSP SED (direct FSPS)') 
+        if Cal_direct_FSPS:
+            ax.plot(csp_FSPS[0], csp_FSPS[1], 'r-.', lw = 3, label = 'CSP SED (direct FSPS)') 
         ax.set_xlabel(r"Wavelength ($\AA$)")
         ax.set_ylabel(r"Luminosity ($L_\odot\,\AA^{-1}$)")
         ax.set_title("Composite Stellar Population SED")
@@ -363,6 +382,10 @@ if __name__ == "__main__":
         ax.legend()
     
         plt.tight_layout()
-        plt.savefig(f'./../data/csp_sed_output_{gal_lb}.png', dpi=150)
+        if Cal_direct_FSPS:
+            f_figure_out = f'./../outputs/plots/csp_sed_output_{gal_lb}_directFSPS.png'
+        else:
+            f_figure_out = f'./../outputs/plots/csp_sed_output_{gal_lb}.png'
+        plt.savefig(f_figure_out, dpi=150)
         # plt.show()
         print("\nDone. Figure saved.")
