@@ -163,8 +163,13 @@ def build_csp_sed(sfh_time, sfh_sfr, t_obs,
 
     # SSP age for each bin  [Gyr]
     #
-    #    The representative cosmic time of bin i is the bin MIDPOINT:
+    #    The representative cosmic time of bin i is:
+    #    FRONT
+    #        t_front_i = t_i
+    #    MIDDLE (bin MIDPOINT)
     #        t_mid_i = 0.5 * (t_{i+1} + t_i)
+    #    BACK
+    #        t_back_i = t{i+1}
     #    The SSP age (how old those stars are at t_obs) is:
     #        tau_i   = t_obs - t_mid_i
     #
@@ -282,12 +287,12 @@ def direct_fsps(SFH_cosmic_time, SFH_sfr, Z = "solar"):
     sp = fsps.StellarPopulation(compute_vega_mags=False,
                                 zcontinuous=3,
                                 sfh=3,)
-    Z_array = _get_metallicity(Z, len(SFH_time))
+    Z_array = _get_metallicity(Z, len(SFH_cosmic_time))
 
-    sp.set_tabular_sfh(age = SFH_time, sfr = SFH_sfr, Z = Z_array)
+    sp.set_tabular_sfh(age = SFH_cosmic_time, sfr = SFH_sfr, Z = Z_array)
 
     # Calculate CSP SED
-    wave, spec = sp.get_spectrum(tage = max(SFH_time), peraa = True)
+    wave, spec = sp.get_spectrum(tage = max(SFH_cosmic_time), peraa = True)
 
     return wave, spec
 
@@ -320,6 +325,7 @@ if __name__ == "__main__":
     # --- Observation epoch ---------------------------------------------------
     Galaxy_lb_list = [0, 1, 2, 4, 6, 8, 10, 13] # Gyr
     Cal_direct_FSPS = True
+    bin_position = 'middle'
     for gal_lb in Galaxy_lb_list:
         print ("--------------------------------------------------------------\n") 
         print (f"Calculating CSP SED (t_lookback = {gal_lb} Gyr)")
@@ -333,7 +339,7 @@ if __name__ == "__main__":
         # --- Compute CSP SED -----------------------------------------------------
         csp_sed, t_grid, sfr_grid, mass_bins = build_csp_sed(
             SFH_time, SFH_sfr, t_obs,
-            ssp_ages, ssp_seds
+            ssp_ages, ssp_seds, bin_position,
         )
     
     
